@@ -143,7 +143,7 @@ h4 {
 }
 
 table {
-  margin: 10px 0;
+	margin: 10px;
 }
 
 td {
@@ -2563,3 +2563,5 @@ nav .form-control {
 .router-link-never-mark-active, .router-link-never-mark-active:hover {
   text-decoration: none;
 }
+
+/* END gov header tweaks */
