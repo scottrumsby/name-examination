@@ -133,7 +133,6 @@
   }
 </script>
 
-
 <style scoped>
   #admin {
     font-size: 19px;
