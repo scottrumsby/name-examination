@@ -56,7 +56,7 @@ describe('StdHeader.vue', () => {
     })
 
     it('offers a link to /home from logo', (done) => {
-      click('.navbar-brand');
+      click('#bcgovnamexlogo');
 
       setTimeout(() => {
         expect(window.location.pathname).toEqual('/home')

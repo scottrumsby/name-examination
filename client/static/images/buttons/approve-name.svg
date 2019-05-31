@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="209px" height="40px" viewBox="0 0 209 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
+    <title>approve name</title>
+    <desc>Created with Sketch.</desc>
+    <g id="approve-name" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g>
+            <polygon id="Rectangle-3-Copy" fill="#82C545" points="40 0 209 0 209 40 40 40"></polygon>
+            <rect id="Rectangle-8" fill="#417505" x="0" y="0" width="40" height="40"></rect>
+            <text id="Approve-Name" font-family="MyriadPro-Semibold, Myriad Pro" font-size="16" font-weight="500" fill="#FFFFFF">
+                <tspan x="72.46" y="25">Approve Name</tspan>
+            </text>
+            <polyline id="approve-name-check" stroke="#FFFFFF" stroke-width="3" points="9 21.1948242 16.0712891 28.2661133 31.3374023 13"></polyline>
+        </g>
+    </g>
+</svg>

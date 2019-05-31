@@ -33,7 +33,7 @@ export default new Vuex.Store({
     currentCondition: null, // the condition currently in focus
     currentTrademark: null, // the trademark currently in focus
     currentHistory: null,  //NR number of history name selected
-
+    
     currentRecipeCard: null,
     is_my_current_nr: false,
     is_editing: false,
@@ -47,7 +47,6 @@ export default new Vuex.Store({
     listJurisdictions: null, // DROP LIST
     listRequestTypes: null, // DROP LIST
     listDecisionReasons: null,
-
     requestTypeRules: null, // list of request type rules, internal use only no display
 
     //Names Data
@@ -213,6 +212,11 @@ export default new Vuex.Store({
       conditional: {response: {numfound: ''}},
       rejected: {response: {numfound: ''}}
     },
+    
+    //introduced during name-examination code with us upgrade
+    activeRequestBannerPopUp: null,
+    showCommentsPopUp: false,
+    newComment: null,
   },
   mutations: {
     requestType (state, value) {
@@ -798,7 +802,13 @@ export default new Vuex.Store({
       console.log('Changing NR Number to ' + value)
       state.compInfo.nrNumber = value
     },
-
+    
+    //introduced by name-examination code with us upgrade
+    toggleRequestBannerPopUp: (state, payload) => state.activeRequestBannerPopUp = payload,//ReqInfoHeader active popup
+    toggleCommentsPopUp: (state, payload) => state.showCommentsPopUp = payload,//app-wide comments popup visibility
+    setNewComment: (state, payload) => state.newComment = payload,//captured user-input in app-wide comments popup
+    setEditing: (state, payload) => state.is_editing = payload,
+    
     // not used
     setConflicts(state,conflictJSon) {
       console.log('setting conflict values')
@@ -1114,49 +1124,48 @@ export default new Vuex.Store({
       state.authorized=sessionStorage.getItem('AUTHORIZED')
     },
 
-    setErrorJSON(state,value) {
+    setErrorJSON(state, value) {
       state.errorJSON = value
-    }
-
+    },
   },
   actions: {
     logout({commit, state}) {
-
+      
       commit('clearAuthData')
-
+      
       sessionStorage.removeItem('KEYCLOAK_REFRESH')
       sessionStorage.removeItem('KEYCLOAK_TOKEN')
       sessionStorage.removeItem('AUTHORIZED')
       sessionStorage.removeItem('KEYCLOAK_EXPIRES')
       sessionStorage.removeItem('USERNAME')
       sessionStorage.removeItem('USER_ROLES')
-
+      
     },
-
+    
     loadSetUp({dispatch}){
-
+      
       //TODO - reset everything and force login???
       // clear values from local storeage
       dispatch('logout')
       //console.log('Logout 660')
-
+      
       //Read Configuration.json File
       readJFile('static/config/configuration.json', function (myArray) {
         axios.defaults.baseURL = myArray[0]['URL']
         console.log("Setting axios.baseURL to: " + axios.defaults.baseURL)
-
+        
         //load UI dropdowns from json files and database tables
         dispatch('loadDropdowns');
-
+        
         //load admin link
         dispatch('loadAdminLink',myArray)
-
+        
       })
     },
-
+    
     tryAutoLogin ({commit}) {
     },
-
+    
     checkToken({dispatch, state}) {
       // checks if keycloak object exists - if not then state is unstable, force logout
       if (state.myKeycloak==null) {
@@ -1169,15 +1178,15 @@ export default new Vuex.Store({
       }
       // checks if keycloak object has tokenParsed yet, if not then just return as this only happens at login
       if(state.myKeycloak.tokenParsed==null){ return }
-
+      
       var expiresIn = state.myKeycloak.tokenParsed['exp'] - Math.ceil(new Date().getTime() / 1000)
-
+      
       console.log('Token expires in ' + expiresIn + 'seconds, updating')
-
+      
       if (expiresIn < 1700 && expiresIn > 0) {
         console.log('Updating Token')
         dispatch('updateToken')
-
+        
       } else if(expiresIn < 0) {
         //TODO - reset everything and force login???
         console.log('Force Logout')
@@ -1186,7 +1195,7 @@ export default new Vuex.Store({
         //console.log('Logout 696')
       }
     },
-
+    
     updateToken({commit, state}) {
       const vm = this;
       state.myKeycloak.updateToken(-1).success(function (refreshed) {
@@ -1201,7 +1210,7 @@ export default new Vuex.Store({
         console.log('Failed to refresh the token, or the session has expired');
       });
     },
-
+    
     checkError({commit},responseJSON){
       console.log("ErrorChecking: ", responseJSON)
       if( responseJSON.warnings != null ){
@@ -1214,12 +1223,12 @@ export default new Vuex.Store({
         commit('setErrorJSON',responseJSON)
       }
     },
-
+    
     setDetails({commit, state}) {
       var detail = state.details?null:"1";
       commit('saveDetail',detail)
     },
-
+    
     getpostgrescompNo ({commit, dispatch, state}) {
       console.log('action: select next company number from postgres')
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
@@ -1249,35 +1258,35 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     updateNRState ({commit, state, dispatch},nrState) {
       console.log('Updating Examination state for number ' + state.compInfo.nrNumber + ' to ' + nrState)
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/' + state.compInfo.nrNumber
-
+      
       axios.patch(url,{"state": nrState} ,{headers: {Authorization: `Bearer ${myToken}`}})
         .then(function(response){
           console.log('state updated to ' + nrState + ' for ' + state.compInfo.nrNumber);
           dispatch('getpostgrescompInfo', state.compInfo.nrNumber);
-
+          
         })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     cancelNr({commit, state, dispatch},nrState) {
       console.log('Cancelling for number ' + state.compInfo.nrNumber)
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/' + state.compInfo.nrNumber
-
+      
       axios.patch(url,{"state": nrState, "comments": state.internalComments} ,{headers: {Authorization: `Bearer ${myToken}`}})
         .then(function(response){
           console.log('CANCELLED ' + state.compInfo.nrNumber);
           dispatch('getpostgrescompInfo', state.compInfo.nrNumber);
-
+          
         })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     nameAcceptReject( {commit, dispatch, state}) {
       console.log('Name Accepted/Rejected for ' + state.compInfo.nrNumber + ", " + state.currentName)
       console.log(state.currentNameObj);
@@ -1286,7 +1295,7 @@ export default new Vuex.Store({
       axios.put(url, state.currentNameObj, {headers: {Authorization: `Bearer ${myToken}`}})
         .then(function(response){
           console.log('Name ' + state.currentChoice + ' accepted/rejected for ' + state.compInfo.nrNumber);
-
+          
           // Was this an accept? If so complete the NR
           if (state.currentNameObj.state == 'APPROVED') {
             dispatch('updateNRState', 'APPROVED');
@@ -1297,15 +1306,15 @@ export default new Vuex.Store({
           }
           // This was a reject? If so check whether there are any more names
           else {
-
+            
             if (state.currentChoice == 1) {
               if (state.compInfo.compNames.compName2.state == null || state.compInfo.compNames.compName2.state !== 'NE') {
                 dispatch('updateNRState', 'REJECTED');
               } else {
-
+                
                 // save updated name with new state, decision text, etc.
                 commit('compName1', state.currentNameObj);
-
+                
                 // we'e got another choice to move on to so move to the next
                 commit('currentNameObj', state.compInfo.compNames.compName2);
               }
@@ -1315,7 +1324,7 @@ export default new Vuex.Store({
               } else {
                 // save updated name with new state, decision text, etc.
                 state.compInfo.compNames.compName2 = state.currentNameObj;
-
+                
                 // we'e got another choice to move on to so move to the next
                 commit('currentNameObj', state.compInfo.compNames.compName3);
               }
@@ -1330,17 +1339,17 @@ export default new Vuex.Store({
           dispatch('getpostgrescompInfo', state.compInfo.nrNumber);
         })
     },
-
+    
     //updates the names data, through the api, into the database
     updateRequest( {commit, state}) {
-
+      
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       commit('update_nrData')
       const url = '/api/v1/requests/' + state.compInfo.nrNumber
       axios.put(url, state.nrData, {headers: {Authorization: `Bearer ${myToken}`}})
         .then(function(response){
           console.log('Request updated for ' + state.compInfo.nrNumber)
-
+          
           // load updated data from response
           if (response.data !== undefined && response.data.nrNum !== undefined) {
             commit('loadCompanyInfo',response.data);
@@ -1348,16 +1357,16 @@ export default new Vuex.Store({
         })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     undoDecision({state}, nameChoice) {
       console.log('Undo decision for name #' + nameChoice);
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN');
-
+      
       var objName = {}
       if (nameChoice == 1) objName = this.getters.compName1;
       if (nameChoice == 2) objName = this.getters.compName2;
       if (nameChoice == 3) objName = this.getters.compName3;
-
+      
       objName.state = 'NE';
       objName.conflict1 = null;
       objName.conflict2 = null;
@@ -1366,21 +1375,19 @@ export default new Vuex.Store({
       objName.conflict2_num = null;
       objName.conflict3_num = null;
       objName.decision_text = null;
-      objName.consumptionDate = null;
-      objName.corpNum = null;
       objName.comment = null;
-
-
+      
+      
       const url = '/api/v1/requests/' + state.compInfo.nrNumber + '/names/' + nameChoice;
       axios.put(url, objName, {headers: {Authorization: `Bearer ${myToken}`}})
         .then(function(response){
-
+          
           // get full NR from scratch
           this.getpostgrescompInfo(state.compInfo.nrNumber);
         })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     loadAdminLink({state},myArray){
       //Set Admin URL
       if(myArray[0]['NODE_ENV']=='production') {
@@ -1391,34 +1398,34 @@ export default new Vuex.Store({
         state.adminURL = 'https://namex-solr-dev.pathfinder.gov.bc.ca'
       }
     },
-
+    
     loadDropdowns( {commit, state} ) {
       var json_files_path = 'static/ui_dropdowns/';
-
+      
       console.log("Load Drop Downs");
       console.log("Jurisdictions");
-
+      
       // jurisdictions - first list 1, then list 2
       if (state.listJurisdictions === null) {
         readJFile(json_files_path + 'jurisdiction 1.json', function (myArray) {
           commit('listJurisdictions', myArray);
-
+          
           readJFile(json_files_path + 'jurisdiction 2.json', function (myArray) {
-
+            
             // sort the country list alphabetically
             myArray.sort(function(a,b) {return (a.text > b.text) ? 1 : ((b.text > a.text) ? -1 : 0);} );
-
+            
             commit('listJurisdictions', state.listJurisdictions.concat(myArray));
           });
         });
       }
-
+      
       console.log("Request Types")
       // request types
       if (state.listRequestTypes === null) {
         readJFile(json_files_path + 'requesttype.json', function (myArray) { commit('listRequestTypes', myArray);})
       }
-
+      
       console.log("Decision Reasons")
       // decision reasons
       if (state.listDecisionReasons === null) {
@@ -1428,7 +1435,7 @@ export default new Vuex.Store({
           commit('listDecisionReasons',response.data)
         })
       }
-
+      
       // request type rules - from CSV, not JSON
       if (state.requestTypeRules === null) {
         readCsv(json_files_path + 'request_type_rules.csv', function (myArray) {
@@ -1436,28 +1443,28 @@ export default new Vuex.Store({
         });
       }
     },
-
+    
     newNrNumber({commit,dispatch},nrNum) {
       //save current state ??
-
+      
       // reset the store values to null
       console.log('Setting current state JSON to null')
       dispatch('resetValues')
-
+      
       // By setting the NR number, this should(doesn't) trigger the watcher located on the RequestInfoHeader.vue component to fire
       commit('nrNumber',nrNum)
       console.log('nrNumber updated to ' + nrNum)
-
+      
       console.log('Getting NR data')
       dispatch('getpostgrescompInfo',nrNum)
-
+      
       //TODO: this is called in reset values already -- take out and test
       commit('is_making_decision', false);
     },
-
+    
     getConflictInfo ({state,commit},value) {
       if (value == null || value.nrNumber == null) { return; }
-
+      
       console.log('Getting Conflict Info')
       commit('currentConflict', value);
       if(value.source == "CORP" ){
@@ -1469,7 +1476,7 @@ export default new Vuex.Store({
         this.dispatch('getNamesConflict',value)
       }
     },
-
+    
     getNamesConflict ({state,commit},value) {
       console.log('action: getting data for company number: ' + value.nrNumber)
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
@@ -1481,7 +1488,7 @@ export default new Vuex.Store({
       })
         .catch(error => this.dispatch('checkError',{errors:[{code:404, message:{"NR Info Error":["NR info could not be displayed because it isn't loaded in postgres yet."]}}]}))
     },
-
+    
     getCorpConflict ({state,commit,dispatch},value) {
       console.log('action: getting data for company number: ' + value.nrNumber )
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
@@ -1493,7 +1500,7 @@ export default new Vuex.Store({
       })
         .catch(error => this.dispatch('checkError',{errors:[{code:404, message:{"Corp Info Error":["Corporation info could not be displayed because it isn't in fdw-registries data."]}}]}))
     },
-
+    
     getHistoryInfo ({state,commit,dispatch},value) {
       console.log('action: getting HistoryInfo for company number: ' + value.nr_num)
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
@@ -1505,7 +1512,7 @@ export default new Vuex.Store({
       })
         .catch(error => this.dispatch('checkError',{errors:[{code:404, message:{"NR Info Error":["NR info could not be displayed because it isn't loaded in postgres yet."]}}]}))
     },
-
+    
     getSearchDataJSON( {commit, state}, val) {
       console.log('action: get search Data');
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN');
@@ -1520,7 +1527,7 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     getStatsDataJSON( {commit, state},stateCd ) {
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN');
       var newQuery = '?order=priorityCd:desc,submittedDate:asc&queue=' + stateCd + '&furnished=true&unfurnished=true&rows=1&start=0'
@@ -1538,11 +1545,11 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     setCurrentName({commit, state},objName ) {
       commit('currentNameObj', objName);
     },
-
+    
     runManualRecipe({dispatch,state},searchObj) {
       console.log('running manual recipe with: ', searchObj.searchStr, '/', searchObj.exactPhrase);
       if( state.currentChoice != null) {
@@ -1556,11 +1563,11 @@ export default new Vuex.Store({
         this.dispatch('checkManualHistories',searchObj.searchStr)
       }
     },
-
+    
     checkManualExactMatches( {commit, state}, query ) {
-
+      
       commit('setExactMatchesConflicts', null);
-
+      
       console.log('action: getting exact matches for number: ' + state.compInfo.nrNumber + ' from solr')
       query = query.replace(' \/','\/')
         .replace(/(^|\s+)(\$+(\s|$)+)+/g, '$1DOLLAR$3')
@@ -1585,12 +1592,12 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR (exact matches): ' + error))
     },
-
+    
     checkManualSynonymMatches( {dispatch,commit,state}, searchObj ) {
       var searchStr = ((searchObj.searchStr == '') ? '*' : searchObj.searchStr);
       var exactPhrase = searchObj.exactPhrase;
       commit('setSynonymMatchesConflicts', null);
-
+      
       console.log('action: getting synonym matches for number: ' + state.compInfo.nrNumber + ' from solr')
       searchStr = searchStr.replace(/\//g,' ')
         .replace(/\\/g,' ')
@@ -1613,11 +1620,11 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR (synonym matches): ' + error))
     },
-
+    
     checkManualCobrsPhoneticMatches( {dispatch,commit,state}, searchObj ) {
       var query = ((searchObj.searchStr == '') ? '*' : searchObj.searchStr);
       commit('setCobrsPhoneticConflicts', null);
-
+      
       console.log('action: getting CobrsPhonetic matches for number: ' + state.compInfo.nrNumber + ' from solr')
       query = query.replace(/\//g,' ')
         .replace(/\\/g,' ')
@@ -1639,11 +1646,11 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR (CobrsPhonetic matches): ' + error))
     },
-
+    
     checkManualPhoneticMatches( {dispatch,commit,state}, searchObj) {
       var query = ((searchObj.searchStr == '') ? '*' : searchObj.searchStr);
       commit('setPhoneticConflicts', null);
-
+      
       console.log('action: getting Phonetic matches for number: ' + state.compInfo.nrNumber + ' from solr')
       query = query.replace(/\//g,' ')
         .replace(/\\/g,' ')
@@ -1665,7 +1672,7 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR (Phonetic matches): ' + error))
     },
-
+    
     checkManualConditions( {commit, state},searchStr ) {
       if (searchStr != '') {
         console.log('action: manual check of restricted words and conditions for company number: ' + state.compInfo.nrNumber)
@@ -1681,7 +1688,7 @@ export default new Vuex.Store({
           .catch(error => console.log('ERROR: ' + error))
       }
     },
-
+    
     checkManualHistories( {commit, state},searchStr ) {
       if (searchStr != '') {
         console.log('action: manual check of history for company number: ' + state.compInfo.nrNumber + ' from solr')
@@ -1707,7 +1714,7 @@ export default new Vuex.Store({
           .catch(error => console.log('ERROR: ' + error))
       }
     },
-
+    
     checkManualTrademarks( {commit, state},searchStr ) {
       if (searchStr != '') {
         console.log('action: manual check of trademarks for company number: ' + state.compInfo.nrNumber + ' from solr')
@@ -1742,7 +1749,7 @@ export default new Vuex.Store({
           .catch(error => console.log('ERROR: ' + error))
       }
     },
-
+    
     syncNR({dispatch,commit},nrNumber) {
       console.log('action: syncing data for nr number: ' + nrNumber + ' from with nro')
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
@@ -1756,7 +1763,7 @@ export default new Vuex.Store({
       })
         .catch(error => console.log('ERROR: ' + error))
     },
-
+    
     resetValues({state, commit}){
       // clear NR specific JSON data so that it can't get accidentally re-used by the next NR number
       console.log('Deleting conflict data from state');
@@ -1766,39 +1773,62 @@ export default new Vuex.Store({
       commit('setCobrsPhoneticConflicts', null);
       commit('setPhoneticConflicts', null);
       commit('currentConflict', null)
-
+      
       console.log('Deleting NamesConflictJSON from state')
       commit('loadNamesConflictJSON',null)
-
+      
       console.log('Deleting CorpConflictJSON from state')
       commit('loadCorpConflictJSON',null)
-
+      
       console.log('Deleting conditionsJSON from state')
       commit('loadConditionsJSON',null)
-
+      
       console.log('Deleting HistoriesJSON from state')
       commit('loadHistoriesJSON',null)
-
+      
       console.log('Deleting HistoriesInfoJSON from state')
       commit('loadHistoriesInfoJSON',null)
       commit('currentHistory',null)
-
+      
       console.log('Deleting TrademarksJSON from state')
       commit('currentTrademark',null)
       commit('loadTrademarksJSON',null)
-
+      
       // reset all flags like editing, making decision, etc.
       state.is_editing = false;
       state.is_making_decision = false;
       state.decision_made = null;
       state.acceptance_will_be_conditional = false;
       state.is_header_shown = false;
-
+      
     },
     resetHistoriesInfo({commit}) {
       commit('loadHistoriesInfoJSON',null)
     },
-
+  
+    postComment({commit, state}) {
+      console.log('new comments tried')
+      const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
+      const myHeader = {headers: {Authorization: `Bearer ${myToken}`}, spinner: '.conditions-spinner'};
+      const url = `/api/v1/requests/${state.compInfo.nrNumber}/comments`
+      let data = { comment: state.newComment }
+      console.log(data)
+      axios.post(url, data, {headers: {Authorization: `Bearer ${myToken}`}}).then(response => {
+        let comments
+        if (state.internalComments &&
+          Array.isArray(state.internalComments) &&
+          state.internalComments.length > 0) {
+          comments = Object.assign([], state.internalComments)
+        } else {
+          comments = []
+        }
+        comments.push(response.data)
+        commit('internalComments', comments)
+        commit('setNewComment', null)
+      })
+        .catch(error => console.log('ERROR: ' + error))
+    },
+    
   },
   getters: {
     keycloak(state) {
@@ -1976,7 +2006,7 @@ export default new Vuex.Store({
         }
         return retval;
       }
-
+      
       return null
     },
     expiryDateForEdit(state) {
@@ -1998,11 +2028,11 @@ export default new Vuex.Store({
         thedate = state.compInfo.compNames.compName2.consumptionDate;
       }
       else thedate = state.compInfo.compNames.compName3.consumptionDate;
-
+      
       if (thedate != null)
         return new Date(thedate).toLocaleString('en-ca',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'});
       return null
-
+      
     },
     submitCount(state) {
       return state.submitCount;

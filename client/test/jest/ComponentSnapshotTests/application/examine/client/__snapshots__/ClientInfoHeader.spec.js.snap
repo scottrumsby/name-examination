@@ -1,3 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ClientInfoHeader.vue renders a ClientInfoHeader component 1`] = `<!---->`;
+exports[`ClientInfoHeader.vue renders a ClientInfoHeader component 1`] = `
+<fragment>
+  <!---->
+   
+  <v-layout
+    dk-grey=""
+    wrap=""
+  >
+    <v-flex
+      lg12=""
+    >
+       
+    </v-flex>
+     
+    <!---->
+     
+    <!---->
+     
+    <!---->
+  </v-layout>
+</fragment>
+`;
