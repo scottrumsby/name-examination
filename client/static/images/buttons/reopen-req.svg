@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="139px" height="40px" viewBox="0 0 139 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
+    <title>Reopen</title>
+    <desc>Created with Sketch.</desc>
+    <g id="LAYOUT" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Styleguide" transform="translate(-79.000000, -1750.000000)">
+            <g id="Reopen" transform="translate(79.000000, 1750.000000)">
+                <rect id="Rectangle-8-Copy" fill="#1A5A96" x="0" y="0" width="40" height="40"></rect>
+                <polygon id="Rectangle-3-Copy" fill="#5BC2E7" points="39 0 139 0 139 40 39 40"></polygon>
+                <text id="Re-Open" font-family="MyriadPro-Semibold, Myriad Pro" font-size="16" font-weight="500" fill="#FFFFFF">
+                    <tspan x="59.784" y="25">Re-Open</tspan>
+                </text>
+                <g id="re-open-icon" transform="translate(8.000000, 10.000000)" stroke="#FFFFFF" stroke-width="2.67">
+                    <path d="M11.3137085,19.3137085 C15.7319865,19.3137085 19.3137085,15.7319865 19.3137085,11.3137085 C19.3137085,9.25377543 18.5351486,7.37568477 17.2562364,5.957644 C15.7920547,4.33417899 13.6720534,3.3137085 11.3137085,3.3137085 C9.18980878,3.3137085 7.25922024,4.14137201 5.82688085,5.49176107 C4.2795722,6.95054149 3.3137085,9.01933022 3.3137085,11.3137085" id="Oval-2" transform="translate(11.313708, 11.313708) rotate(-225.000000) translate(-11.313708, -11.313708) "></path>
+                    <path d="M11.5,1.40909091 L11.5,9.59090909" id="Line-9" stroke-linecap="square"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

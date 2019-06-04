@@ -1,0 +1,5 @@
+@import '~vuetify/src/styles/styles.sass';
+
+$font-size-root: 14px;
+$material-light: map-merge($material-light, ( cards: blue ));
+$btn-border-radius: 0px;

@@ -8,6 +8,7 @@ import Vuelidate from 'vuelidate'
 import Datatable from 'vue2-datatable-component'
 import BootstrapVue from 'bootstrap-vue'
 import { Table } from 'bootstrap-vue/es/components'
+import { Plugin } from 'vue-fragment'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import './stylus/main.styl'
@@ -21,6 +22,7 @@ Vue.use(require('vue-shortkey'))
 Vue.use(Datatable)
 Vue.use(BootstrapVue)
 Vue.use(Table)
+Vue.use(Plugin)
 
 //axios.defaults.baseURL =  <-- set in setttings and auto login
 axios.defaults.headers.get['Accept'] = 'application/json'

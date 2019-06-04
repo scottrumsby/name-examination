@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="169px" height="40px" viewBox="0 0 169 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
+    <title>reject name</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="reject-name-copy-2" transform="translate(-40.000000, 0.000000)">
+            <g id="reject-name" transform="translate(40.000000, 0.000000)">
+                <polygon id="Rectangle-3" fill="#5BC2E7" points="5.53736533e-14 0 169 0 169 40 5.53736533e-14 40"></polygon>
+                <text id="Hide-Details" font-family="MyriadPro-Semibold, Myriad Pro" font-size="16" font-weight="500" fill="#FFFFFF">
+                    <tspan x="39.708" y="25">Show Details</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
