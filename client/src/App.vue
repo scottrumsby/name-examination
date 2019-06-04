@@ -3,8 +3,11 @@
 <template>
   <div>
     <!-- error msgs from backend -->
-    <div class="modal fade" id="error-message-modal" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="error-message-modal"
+         style="position: absolutle; z-index: 1201" role="dialog">
+      <div class="modal-dialog modal-lg mt-5"
+           style="position: relative; top: 100px; width: auto; margin-left: auto; margin-right: auto"
+           role="document">
         <div class="modal-content">
           <div v-if="errorMsg != ''">
             <div class="modal-header modal-header-error" id="errorModalLabel">
@@ -15,7 +18,8 @@
             </div>
           </div>
           <div v-if="warningMsg != ''">
-            <div class="modal-header modal-header-warning" id="warningModalLabel">
+            <div class="modal-header modal-header-warning"
+                 id="warningModalLabel">
               <h5 class="modal-title">WARNING</h5>
             </div>
             <div class="modal-body pre-line">
@@ -97,11 +101,9 @@ export default {
 </script>
 
 <style>
-  #app {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-  }
+  /*app-wide import of css variables to use in scoped and inline style*/
+  @import '~/../../static/css/variables.css';
+
   .modal-header-error {
     background-color: #ea9999;
   }

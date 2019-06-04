@@ -20,86 +20,208 @@
   src: url('../fonts/open-sans/OpenSans-Italic.ttf');
 }
 
-:root {
-  --priority:   #e01e36;
-  --rejected:   #e01e36;
-  --red:        #e01e36;
+@import './variables.css';
 
-  --dk-blue:    #003366;
-  --blue:       #1a5a96;
-  --link:       #1a5a96;
-  --lt-blue:    #dceffa;
-  --ex-lt-blue: #ecf7fc;
-
-  --dk-grey:    #494949;
-  --text:       #494949;
-  --grey:       #bcbec5;
-  --outline:    #bcbec5;
-  --lt-grey:    #dddddd;
-  --ex-lt-grey: #f2f2f2;
-
-  --cyan:       #5bc2e7;
-
-  --green:      #82c545;
-  --accepted:   #82c545;
-  --dk-green:   #417505;
-
-  --gold:       #fcba19;
+#admin::before {
+  color: transparent
 }
 
--webkit-font-smoothing: antialiased;
+#admin {
+  font-family: OpenSans !important;
+  font-size: 16px;
+  font-weight: 400;
+  padding-top: 1px;
+  color: var(--link) !important;
+  text-decoration: none;
+}
+
+#app {
+  margin-top: 56px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.action-button {
+  background-color: var(--cyan) !important;
+  height: 40px;
+  color: white;
+  font-size: 16px;
+}
+
+.applicant-info-field {
+  background-color: white;
+  height: 34px;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  border: 1px solid var(--l-grey);
+  padding: 4px !important;
+  font-size: 15px;
+}
+
+.c-grey {
+  color: var(--grey) !important;
+}
+
+.c-link {
+  color: var(--link) !important;
+}
+
+.c-priority {
+  color: var(--priority) !important;
+}
+
+.dk-grey {
+  color: var(--text) !important;
+}
+
+.field-error {
+  color: var(--priority) !important;
+  font-size: 12px !important;
+}
+
+.fs-13 {
+  font-size: 13px !important;
+}
+
+.fs-14 {
+  font-size: 13px !important;
+}
+
+.fs-15 {
+  font-size: 15px !important;
+}
+
+.fs-16 {
+  font-size: 16px !important;
+}
+
+.fs-16-fw-700 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+.fs-18 {
+  font-size: 18px !important;
+}
+.ft-ital {
+  font-style: italic;
+}
+
+.fw-600 {
+  font-weight: 600;
+}
+
+.fw-700 {
+  font-weight: 700;
+}
+
+.input-box-editing {
+  background-color: white;
+  height: 38px;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  border: 1px solid var(--l-grey);
+  padding: 4px !important;
+}
+
+.mirrored {
+  transform: scaleX(-1);
+}
+
+.priority {
+  color: var(--priority) !important;
+}
+
+.red-text {
+  color: var(--priority) !important;
+}
+
+.rejected  {
+  color: var(--rejected) !important;
+}
+.RequestInfoHeader {
+  font-size: 14px;
+}
+
+.xl-grey-bg {
+  background-color: var(--xl-grey) !important;
+}
+
+/* overrides of vuetify styles */
+.theme--light.v-sheet {
+  color: var(--text) !important;
+}
+
+.v-menu__content {
+  top: 0px !important;
+  left: 0px !important;
+}
+
+.v-btn::before {
+  color: transparent !important;
+}
+
+.v-btn:active, .v-btn:focus {
+  border: none !important;
+  outline: none !important;
+}
 
 .v-btn__content, .v-btn {
   font-family: OpenSans !important;
   font-weight: 400 !important;
 }
 
-#admin {
-  font-family: OpenSans !important;
-  font-weight: 400 !important;
-  font-size: 17px !important;
-}
-
-.v-tabs__item {
-  font-family: OpenSans !important;
-}
-:not(.v-tabs__item--active) {
-  opacity: 1 !important;
-}
-
 .v-input__slot:after, .v-input__slot:before {
-  text-decoration: none !important;
   display: none !important;
+  text-decoration: none !important;
 }
 
-.v-tabs__slider {
-  transform: translateY(-62px);
-  height: 3px !important;
+.v-ripple__animation {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.v-ripple__container {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+.v-tabs__item {
+  color: var(--link) !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  font-weight: 400;
+  text-decoration: none !important;
 }
 
 .v-tabs__item {
-  font-weight: 400;
-  font-size: 17px !important;
-  color: #1A5A96 !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
+  font-family: OpenSans !important;
 }
 
 .v-tabs__item--active {
-  font-weight: 600;
-  font-size: 17px !important;
-  color: #494949 !important;
-  text-decoration: none !important;
+  color: var(--text) !important;
   cursor: default !important;
+  font-size: 16px !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.v-tabs__slider {
+  height: 3px !important;
+  transform: translateY(-66px);
+}
+
+.v-text-field__slot {
+  text-decoration: none !important;
 }
 
 .v-toolbar__content {
   padding: 0px !important;
 }
-
-#app {
-  margin-top: 56px;
+:not(.v-tabs__item--active) {
+  opacity: 1 !important;
 }
+
 
 /*Styles from existing application */
 
@@ -114,9 +236,9 @@ html, body {
 }
 
 body {
-  font-family: OpenSans, Calibri, Arial, 'sans serif';
-  background-color: #f1f1f1;
+  background-color: var(--xl-grey);
   color: #494949;
+  font-family: OpenSans, Calibri, Arial, 'sans serif';
   font-size: 13px;
 }
 
@@ -222,6 +344,19 @@ th {
   text-align: center;
   max-width: 1140px;
   padding: 15px;
+}
+
+.name-state-icon .icon-rejected {
+  color: #c00;
+}
+.name-state-icon .icon-accepted {
+  color: #007bff;
+  font-size: 20px;
+}
+
+.btn-undo {
+  padding: 2px 5px;
+  font-size: 11px;
 }
 
 #header .qa-banner .container .qa-banner-text {
@@ -2538,7 +2673,7 @@ nav .form-control {
 
 /* FORM VALIDATION */
 
-.form-group-error h3, .error {
+.form-group-error h3 {
   color: #cc0000;
 }
 

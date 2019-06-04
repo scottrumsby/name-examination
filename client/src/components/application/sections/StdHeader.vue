@@ -14,9 +14,8 @@
           <v-toolbar flat color="white" height="70px">
             <v-toolbar-items>
               <v-btn flat
-                     class="custom-btn"
                      :ripple="true"
-                     style="width: 170px;" :href="adminURL"
+                     :href="adminURL"
                      id="admin"
                      target="_blank">
                 Admin
@@ -27,10 +26,10 @@
                       v-model="tab">
                 <!--Hidden tab for when viewing part of app that isn't under a tab-->
                 <v-tab to="/" style="display: none"></v-tab>
-                <v-tab v-if="userCanExamine"
-                       to="/nameExamination"
-                       style="width: 170px;">Examine Names</v-tab>
-                <v-tab to="/find" style="width: 170px;" id="header-search-link">Search</v-tab>
+                <v-tab class="std-header-tab-width"
+                       v-if="userCanExamine"
+                       to="/nameExamination">Examine Names</v-tab>
+                <v-tab to="/find" class="std-header-tab-width"  id="header-search-link">Search</v-tab>
               </v-tabs>
             </v-toolbar-items>
           </v-toolbar>
@@ -53,14 +52,15 @@
                       <v-icon>search</v-icon>
                     </v-btn>
                   </div>
+                  <div class="ml-3 mt-auto mb-auto"><router-link to="/stats">Stats</router-link></div>
                 </div>
               </v-form>
-              <div id="userid" class="ml-5 mt-auto mb-auto mp-italic">{{ userId }}</div>
+              <div id="userid" class="ml-5 mt-auto mb-auto fv-ital">{{ userId }}</div>
               <div class="vertical-divider"/>
-              <a class="mt-auto mb-auto mp-16" id="header-logout-button" @click="onLogout">Log Out</a>
+              <a class="mt-auto mb-auto" id="header-logout-button" @click="onLogout">Log Out</a>
             </template>
             <router-link v-if="!auth"
-                         class="mt-auto mb-auto mp-16"
+                         class="mt-auto mb-auto"
                          id="header-login-button"
                          to="/signin">Login</router-link>
           </v-toolbar>
@@ -135,68 +135,50 @@
 
 <style scoped>
   #admin {
-    font-size: 19px;
-    padding-top: 1px;
-    color: #1a5a96 !important;
-    text-decoration: none;
+    width: 170px
   }
-
-  .vertical-divider {
-    width: 1px;
-    height: 30px;
-    border-left: 1px solid #bcbec5;
-    margin: auto 18px auto 18px;
-  }
-  #header-logout-button {
-    font-size: 15px !important;
+  #header-logout-button, #header-login-button {
     color: var(--link) !important;
     cursor: pointer;
+    font-size: 15px !important;
   }
 
-  #admin::before {
-    color: transparent
+  .search-icon {
+    background-color: var(--gold) !important;
+    height: 40px;
+    width: 40px;
   }
 
-  .mp-italic {
-    font-family: MyriadWebPro-Italic;
-    font-size: 16px;
+  .std-header-tab-width {
+    wdith: 170px !important;
   }
 
-  .mp-16 {
-    font-size: 16px;
+  .styled-input {
+    background-color: var(--xl-grey);
+    border: none !important;
+    font-size: 15px;
+    height: 40px;
+    margin-bottom: auto;
+    margin-top: auto;
+    padding: 5px 10px 5px 10px;
+    width: 225px;
   }
 
   .top-nav-toolbar {
-    position: absolute;
-    padding: 0px;
-    left: 0px;
-    top: 0px;
+    background-color: #ffffff !important;
+    box-shadow: 0 0 6px 0 var(--grey);
     height: 70px;
-    background-color: white !important;
-    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.25);
+    left: 0px;
+    padding: 0px;
+    position: absolute;
+    top: 0px;
+    z-index: 1200;
   }
 
- .innactive-tab {
-   font-size: 19px !important;
-   color: #1a5a96 !important;
-   text-decoration: none !important;
- }
-
- .search-icon {
-   background-color: #fcba19 !important;
-   width: 40px;
-   height: 40px;
- }
-
- .styled-input {
-   height: 40px;
-   width: 225px;
-   background-color: #F2F2F2;
-   margin-top: auto;
-   margin-bottom: auto;
-   padding: 5px 10px 5px 10px;
-   border: none !important;
- }
-
-
+  .vertical-divider {
+    border-left: 1px solid var(--d-grey);
+    height: 30px;
+    margin: auto 18px auto 18px;
+    width: 1px;
+  }
 </style>

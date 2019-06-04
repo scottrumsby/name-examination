@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="143px" height="40px" viewBox="0 0 143 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
+    <title>Get Next</title>
+    <desc>Created with Sketch.</desc>
+    <g id="LAYOUT" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Styleguide" transform="translate(-444.000000, -1750.000000)">
+            <g id="Get-Next" transform="translate(444.000000, 1750.000000)">
+                <g>
+                    <polygon id="Rectangle-3" fill="#5BC2E7" points="39.3125 0 143 0 143 40 39.3125 40"></polygon>
+                    <rect id="Rectangle-8" fill="#1A5A96" x="0" y="0" width="40" height="40"></rect>
+                    <g id="next-icon" transform="translate(10.000000, 10.000000)" fill="#FFFFFF">
+                        <g>
+                            <g id="side-arrow" transform="translate(6.000000, 9.000000) rotate(-90.000000) translate(-6.000000, -9.000000) translate(-3.000000, 3.000000)">
+                                <polygon id="Rectangle-9" transform="translate(5.350000, 6.000000) rotate(-45.000000) translate(-5.350000, -6.000000) " points="4 0 6.7 0 6.7 12 4 12"></polygon>
+                                <rect id="Rectangle-9-Copy" transform="translate(12.335000, 5.500000) rotate(45.000000) translate(-12.335000, -5.500000) " x="11" y="0" width="2.67" height="11"></rect>
+                            </g>
+                            <g id="side-arrow-copy-12" transform="translate(15.000000, 9.000000) rotate(-90.000000) translate(-15.000000, -9.000000) translate(6.000000, 3.000000)">
+                                <polygon id="Rectangle-9" transform="translate(5.350000, 6.000000) rotate(-45.000000) translate(-5.350000, -6.000000) " points="4 0 6.7 0 6.7 12 4 12"></polygon>
+                                <rect id="Rectangle-9-Copy" transform="translate(12.335000, 5.500000) rotate(45.000000) translate(-12.335000, -5.500000) " x="11" y="0" width="2.67" height="11"></rect>
+                            </g>
+                        </g>
+                    </g>
+                    <text font-family="MyriadPro-Semibold, Myriad Pro" font-size="16" font-weight="500" fill="#FFFFFF">
+                        <tspan x="62.784" y="25">Get Next</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

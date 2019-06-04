@@ -1,40 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CompName.vue  renders a CompName component 1`] = `
-<div>
-  <div
-    class="name-sect"
+<fragment>
+  <v-container
+    fluid=""
+    ma-0=""
+    pa-0=""
   >
-    <div
-      class="row"
+    <v-layout
+      ml-1=""
+      row=""
     >
-      <div
-        class="col"
+      <v-flex
+        lg6=""
       >
-        <div
-          id="top-buttons"
-        >
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-           
-          <!---->
-        </div>
-         
         <table>
           <tr
             class="name-option"
@@ -47,8 +26,8 @@ exports[`CompName.vue  renders a CompName component 1`] = `
               id="name1"
             >
               
-              
-              
+                
+                
               <span
                 class="name-state-icon"
               />
@@ -74,8 +53,8 @@ exports[`CompName.vue  renders a CompName component 1`] = `
               id="name2"
             >
               
-              
-              
+                
+                
               <span
                 class="name-state-icon"
               />
@@ -101,8 +80,8 @@ exports[`CompName.vue  renders a CompName component 1`] = `
               id="name3"
             >
               
-              
-              
+                
+                
               <span
                 class="name-state-icon"
               />
@@ -118,15 +97,26 @@ exports[`CompName.vue  renders a CompName component 1`] = `
             </td>
           </tr>
         </table>
-         
-        <div>
-          <!---->
-           
-          <!---->
-        </div>
-      </div>
-    </div>
-  </div>
+      </v-flex>
+       
+      <v-flex
+        lg6=""
+      >
+        <!---->
+      </v-flex>
+    </v-layout>
+     
+    <v-layout
+      ml-1=""
+      row=""
+    >
+      <v-flex
+        lg12=""
+      >
+        <!---->
+      </v-flex>
+    </v-layout>
+  </v-container>
    
   <div
     class="modal fade"
@@ -198,5 +188,5 @@ exports[`CompName.vue  renders a CompName component 1`] = `
       </div>
     </div>
   </div>
-</div>
+</fragment>
 `;

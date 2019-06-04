@@ -2,19 +2,15 @@
 
 exports[`NameExamination.vue renders a NameExamination view 1`] = `
 <div>
-  <div
-    class="upper-section container-fluid"
+  <v-container
+    class="white-bg"
+    fluid=""
+    id="info-header-container"
   >
-    <div
-      class="namePage"
-    >
-      <div
-        class="RequestInfoHeader"
-      >
-        <requestinfoheaderview-stub />
-      </div>
-    </div>
-  </div>
+    <requestinfoheaderview-stub />
+     
+    <comments-pop-up-stub />
+  </v-container>
    
   <div
     class="lower-section container-fluid"

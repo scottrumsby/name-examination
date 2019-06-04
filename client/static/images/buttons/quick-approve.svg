@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="133px" height="25px" viewBox="0 0 133 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
+    <title>quick approve</title>
+    <desc>Created with Sketch.</desc>
+    <g id="LAYOUT" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="01A-NAMEX---Conflicts" transform="translate(-1735.000000, -293.000000)">
+            <g id="quick-approve" transform="translate(1735.000000, 293.000000)">
+                <g id="green-approve-icon">
+                    <circle id="Oval" fill="#82C545" cx="12.5" cy="12.5" r="12.5"></circle>
+                    <polyline id="Path-3" stroke="#FFFFFF" stroke-width="3" points="4 12.44158 9.55841996 18 19.6699219 7.13378906"></polyline>
+                </g>
+                <text id="Quick-Approve" font-family="MyriadPro-Regular, Myriad Pro" font-size="16" font-weight="normal" fill="#1A5A96">
+                    <tspan x="34" y="18">Quick Approve</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
