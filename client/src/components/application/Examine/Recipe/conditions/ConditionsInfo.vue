@@ -43,8 +43,15 @@
           { text: 'Examiner Information', value: 'text', align: 'left', sortable: false, width: '34%', class: 'px-1' },
           { text: 'Instructions', value: 'instructions', align: 'left', sortable: false, width: '34%', class: 'px-1' },
         ],
+        listenerAdded: false,
         offset: 0,
         rows: 100,
+      }
+    },
+    mounted() {
+      if (!this.listenerAdded) {
+        document.addEventListener('keydown', event => { this.setConflict(event) })
+        this.listenerAdded = true
       }
     },
     computed: {
@@ -73,6 +80,9 @@
       }
     },
     methods: {
+      setConflict(event) {
+
+      },
       isActive(item) {
         if (!this.currentCondition) return false
         let { id } = this.currentCondition

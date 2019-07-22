@@ -1,435 +1,463 @@
 <!--eslint-disable-->
 <template>
-  <v-layout column id="conflict-list" fs-15 v-if="conflictData.length > 0">
+  <v-container container-style
+               id="conflicts-container">
+    <spinner className="conflict-container-spinner hidden"/>
+    <template v-for="(title, i) in conflictTitles">
+      <!--CASE: EXACT MATCHES ONLY-->
+      <v-layout :class="title.class"
+                :conflict-highlighted="index === i && focus === 'conflicts' "
+                :id="title.id"
+                exact-match-layout
+                v-if="title.nrNumber">
+        <v-flex shrink>
+          <v-checkbox :disabled="!is_making_decision"
+                      :input-value="selectedNRs"
+                      :value="title.nrNumber"
+                      @click.capture.stop.self="setCheckbox(title)"
+                      class="shift-up"/>
+        </v-flex>
+        <v-flex @click="clickExactMatch(title, index)"
+                cursor-pointer
+                grow
+                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                v-html="title.highlightedText"/>
+        <v-flex cursor-pointer
+                lg1
+                v-if="title.jurisdiction">{{ title.jurisdiction }}
+        </v-flex>
+        <v-flex cursor-pointer
+                lg1
+                v-if="title.nrNumber">{{ title.nrNumber }}
+        </v-flex>
+        <v-flex cursor-pointer
+                lg2
+                pr-3
+                text-right
+                v-if="title.startDate">{{ formatDate(title.startDate) }}
+        </v-flex>
+      </v-layout>
 
-    <!-- EXACT MATCH -->
-    <v-flex :class="option.class"
-            :key="option.value"
-            @click="handleClick(option)"
-            v-for="(option, index) in exactMatchData">
-      <template v-if="option.class.indexOf('spinner') >= 0">
-        <spinner className="mini" />
-      </template>
-      <template v-else>
-        <v-flex fw-400 v-html="option.highlightedText">lala</v-flex>
-      </template>
-    </v-flex>
+      <!--CASE:  TITLES WITH CHILDREN / COUNT OF 1 OR MORE / EXPAND COLLAPSE ICONS-->
+      <v-layout :class="title.class"
+                :conflict-highlighted="index === i && focus === 'conflicts' "
+                :id="title.id"
+                @click="clickBucket(title, i)"
+                title-layout
+                v-else-if="title.count > 0">
+        <v-flex cursor-pointer grow>
+          <span v-html="title.highlightedText"></span>
+          <span class="conflict-meta" v-if="title.meta"> - {{ title.meta }}</span>
+        </v-flex>
+        <v-flex cursor-pointer shrink v-if="openBucketIndex === i">
+          {{ title.count }}
+          <v-icon class="negative-margin" cursor-pointer>keyboard_arrow_up</v-icon>
+        </v-flex>
+        <v-flex cursor-pointer shrink v-else>
+          {{ title.count }}
+          <v-icon class="negative-margin">keyboard_arrow_down</v-icon>
+        </v-flex>
+      </v-layout>
 
-    <!-- SYNONYMS -->
-    <v-flex :class="option.class"
-            :key="option.value"
-            :style="option.class.includes('collapsible expanded') ? {backgroundColor: 'var(--xl-grey)'} : ''"
-            @click="handleClick(option)"
-            v-for="(option, index) in synonymMatchData">
+      <!--CASE:  TITLES WITHOUT CHILDREN / 0 COUNTS / NO ICONS -->
+      <v-layout :class="title.class"
+                :conflict-highlighted="index === i && focus === 'conflicts' "
+                :id="title.id"
+                v-else
+                zero-count-title-layout>
+        <v-flex grow>
+          <span v-html="title.highlightedText"></span>
+          <span class="conflict-meta" v-if="title.meta"> - {{ title.meta }}</span>
+        </v-flex>
+      </v-layout>
 
-      <template v-if="option.class == 'conflict-synonym-title'">
-        <v-layout justify-space-between fs-15 pl-3 fw-400>
-          <v-flex grow>
-            <span v-html="option.highlightedText" />
-            <span class="conflict-meta"> - {{ option.meta }}</span>
-          </v-flex>
-          <v-flex shrink>
-            {{ option.count }}
-            <v-icon style="background-color:white; color:white; cursor: auto">keyboard_arrow_down</v-icon>
-          </v-flex>
-        </v-layout>
-      </template>
+      <!--CASE:  RENDERED AFTER ALREADY VISIBLE TITLE WITH COUNT WHEN ITS THE CURRENT INDEX-->
+      <v-flex class="bucket-list"
+              id="bucket-list"
+              v-if="children && openBucketIndex === i">
+          <virtual-list :remain="14"
+                        :scrollelement="containerDivEl"
+                        :size="32">
+            <ConflictListItem :child="child"
+                              :childIndex="childIndex"
+                              :clickChild="clickChild"
+                              :containerDivEl="containerDivEl"
+                              :expandedID="expandedID"
+                              :focus="focus"
+                              :is_making_decision="is_making_decision"
+                              :key="child.id"
+                              :n="n"
+                              :selectedNRs="selectedNRs"
+                              :setCheckbox="setCheckbox"
+                              v-for="(child, n) of children"/>
+          </virtual-list>
+      </v-flex>
 
-      <template v-else-if="option.class.indexOf('conflict-synonym-title collapsible')==0">
-        <v-layout justify-space-between fs-15 pl-3 fw-400>
-          <v-flex grow>
-            <span v-html="option.highlightedText"></span>
-            <span class="conflict-meta"> - {{ option.meta }}</span>
-          </v-flex>
-          <v-flex v-if="option.class.includes('collapsible collapsed')" shrink>
-            {{ option.count }}
-            <v-icon class="negative-margin">keyboard_arrow_down</v-icon>
-          </v-flex>
-          <v-flex v-else shrink>
-            {{ option.count }}
-            <v-icon class="negative-margin">keyboard_arrow_up</v-icon>
-          </v-flex>
-        </v-layout>
-      </template>
+    </template>
+  </v-container>
 
-      <template v-else-if="option.class.indexOf('spinner') >= 0">
-        <v-layout>
-          <v-flex>
-            <spinner className="mini" />
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else>
-        <v-layout>
-          <v-flex  grow fw-400 v-html="option.highlightedText" />
-        </v-layout>
-      </template>
-    </v-flex>
-
-    <!-- COBRS PHONETIC -->
-    <v-flex :class="option.class"
-            :key="option.value"
-            :style="option.class.includes('collapsible expanded') ? {backgroundColor: 'var(--xl-grey)'} : ''"
-            @click="handleClick(option)"
-            v-for="(option, index) in cobrsPhoneticData">
-
-      <template v-if="option.class == 'conflict-cobrs-phonetic-title'">
-        <v-layout justify-space-between fs-15 pl-3 fw-400>
-          <v-flex grow> {{ option.text }} </v-flex>
-          <v-flex shrink>
-            {{ option.count }}
-            <v-icon style="background-color:white; color:white; cursor: auto;">keyboard_arrow_down</v-icon>
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else-if="option.class.indexOf('conflict-cobrs-phonetic-title collapsible')==0">
-        <v-layout justify-space-between fs-15 pl-3 fw-400>
-          <v-flex grow>
-            <span>{{ option.text }}</span>
-          </v-flex>
-          <v-flex shrink  v-if="option.class.indexOf('collapsible collapsed') != -1">
-            {{ option.count }}
-            <v-icon class="negative-margin">keyboard_arrow_down</v-icon>
-          </v-flex>
-          <v-flex shrink  v-else>
-            {{ option.count }}
-            <v-icon class="negative-margin">keyboard_arrow_up</v-icon>
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else-if="option.class.indexOf('spinner') >= 0">
-        <v-layout>
-          <v-flex>
-            <spinner className="mini" />
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else>
-        <v-layout fs-15 pl-3 fw-400>
-          <v-flex  v-html="option.highlightedText"></v-flex>
-        </v-layout>
-      </template>
-    </v-flex>
-
-    <!-- PHONETIC (EXPERIMENTAL) -->
-    <v-flex :class="option.class"
-            :key="option.value"
-            @click="handleClick(option)"
-            v-for="(option, index) in phoneticData">
-
-      <template v-if="option.class == 'conflict-phonetic-title'">
-        <v-layout justify-space-between fs-15 pl-3 fw-400>
-          <v-flex grow>
-            <span>{{ option.text }}</span>
-          </v-flex>
-          <v-flex shrink>
-            {{ option.count }}
-            <v-icon style="background-color:white; color:white; cursor: auto;">keyboard_arrow_down</v-icon>
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else-if="option.class.indexOf('conflict-phonetic-title collapsible')==0">
-        <v-layout justify-space-between fs-15 pl-3 fw-400>
-          <v-flex grow>
-            <span>{{ option.text }}</span>
-          </v-flex>
-          <v-flex shrink  v-if="option.class.indexOf('collapsible collapsed') != -1">
-            {{ option.count }}
-            <v-icon class="negative-margin">keyboard_arrow_down</v-icon>
-          </v-flex>
-          <v-flex v-else shrink>
-            {{ option.count }}
-            <v-icon class="negative-margin">keyboard_arrow_up</v-icon>
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else-if="option.class.indexOf('spinner') >= 0">
-        <v-layout>
-          <v-flex>
-            <spinner className="mini" />
-          </v-flex>
-        </v-layout>
-      </template>
-
-      <template v-else>
-        <v-layout pl-3>
-          <v-flex grow fw-400  v-html="option.highlightedText"></v-flex>
-        </v-layout>
-      </template>
-    </v-flex>
-
-  </v-layout>
 </template>
 
 <script>
-/* eslint-disable */
-  import spinner from '@/components/application/spinner.vue';
+  /* eslint-disable */
+  import spinner from '@/components/application/spinner.vue'
+  import {mapGetters} from 'vuex'
+  import moment from 'moment'
+  import ConflictInfo from './ConflictInfo'
+  import ConflictListItem from './ConflictListItem'
+  import virtualList from 'vue-virtual-scroll-list'
 
   export default {
     name: 'ConflictList',
-    components: {
-      spinner,
-    },
+    components: { virtualList, ConflictListItem, ConflictInfo, spinner },
     data() {
       return {
-        selectedConflict: '',
-        conflictEntries: [],
-        selection: {class: ''}
+        childIndex: 0,
+        index: 0,
+        children: [],
+        cobrs: '',
+        other: '',
+        listener: null,
+        focus: null,
+        listenerBlocked: false,
       }
-    },
-    computed: {
-      conflictData() {
-        let data = [];
-        data = data.concat(this.exactMatchData);
-        data = data.concat(this.synonymMatchData);
-        data = data.concat(this.cobrsPhoneticData);
-        data = data.concat(this.phoneticData);
-
-        this.conflictEntries = data;
-
-        return data;
-      },
-      exactMatchData() {
-        let data = [];
-
-        // add Exact Match header & spinner
-        data = data.concat([{ highlightedText: 'Exact Match', class: 'exact-match-title'}]);
-        data = data.concat([{text: '', class: 'exact-match-spinner spinner-wrapper hidden'}]);
-
-        // add Exact Match data
-        if (this.$store.getters.exactMatchesConflicts && this.$store.getters.exactMatchesConflicts.length > 0) {
-          data = data.concat(this.$store.getters.exactMatchesConflicts);
-        }
-        else {
-          data = data.concat([{ highlightedText:'No Exact Match', class: 'conflict-no-match' }]);
-        }
-
-        return data;
-      },
-      synonymMatchData() {
-        let data = [];
-
-        // add Synonym Match header & spinner
-        data = data.concat([{ highlightedText: 'Exact Word Order + Synonym Match', class: 'synonym-match-title'}]);
-        data = data.concat([{text: '', class: 'synonym-match-spinner spinner-wrapper hidden'}]);
-
-        // add Synonym Match data
-        if (this.$store.getters.synonymMatchesConflicts && this.$store.getters.synonymMatchesConflicts.length) {
-          data = data.concat(this.$store.getters.synonymMatchesConflicts);
-        }
-        else {
-          data = data.concat([{ highlightedText:'No Match', class: 'conflict-no-match' }]);
-        }
-
-        return data;
-      },
-      cobrsPhoneticData() {
-        let data = [];
-
-        // add cobrs phonetic match header & spinner
-        data = data.concat([{ highlightedText: 'Character Swap Match', class: 'cobrs-phonetic-match-title'}]);
-        data = data.concat([{text: '', class: 'cobrs-phonetic-match-spinner spinner-wrapper hidden'}]);
-
-        // add cobrs phonetic data
-        if (this.$store.getters.cobrsPhoneticConflicts && this.$store.getters.cobrsPhoneticConflicts.length > 0) {
-          data = data.concat(this.$store.getters.cobrsPhoneticConflicts);
-        }
-        else {
-          data = data.concat([{ highlightedText:'No Match', class: 'conflict-no-match' }]);
-        }
-
-        return data;
-      },
-      phoneticData() {
-        let data = [];
-
-        // add phonetic match header & spinner
-        data = data.concat([{ highlightedText: 'Phonetic Match (experimental)', class: 'phonetic-match-title'}]);
-        data = data.concat([{text: '', class: 'phonetic-match-spinner spinner-wrapper hidden'}]);
-
-        // add phonetic data
-        if (this.$store.getters.phoneticConflicts && this.$store.getters.phoneticConflicts.length) {
-          data = data.concat(this.$store.getters.phoneticConflicts);
-        }
-        else {
-          data = data.concat([{ highlightedText:'No Match', class: 'conflict-no-match' }]);
-        }
-
-        return data;
-      },
     },
     mounted() {
-      this.selectedConflict = '';
-      this.setSelectedConflict();
-    },
-    methods: {
-      handleClick(option) {
-        if (option.class.indexOf('conflict-synonym-title collapsible') == 0) {
-          this.expand_collapse(option, 'synonym')
-        }
-        if (option.class.indexOf('conflict-cobrs-phonetic-title collapsible') == 0) {
-          this.expand_collapse(option, 'cobrsPhonetic')
-        }
-        if (option.class.indexOf('conflict-phonetic-title collapsible') == 0) {
-          this.expand_collapse(option, 'phonetic')
-        }
-        if (option.class.indexOf('conflict-result') == 0) {
-          this.unselectPreviousSelection()
-          option.class += ' conflict-result-selected'
-          this.selection = option
-          this.selectedConflict = option
-          this.check_deselect()
-        }
-      },
-      unselectPreviousSelection() {
-        this.selection.class = this.selection.class.replace(' conflict-result-selected', '')
-        this.conflictEntries
-        for (let entry of this.conflictEntries) {
-          if (entry.class.includes('conflict-result')) {
-            entry.class = entry.class.replace(' conflict-result-selected', '')
-          }
-        }
-      },
-      expand_collapse(option, bucket) {
-        let toggleIt = false
-        if (bucket == 'synonym') {
-          for (let i = 0; i < this.$store.getters.synonymMatchesConflicts.length; i++) {
-            let entry = this.$store.getters.synonymMatchesConflicts[i]
-            if (entry.class.indexOf('conflict-synonym-title collapsible') == 0) {
-              if (entry.text == option.text) {
-                toggleIt = true
-                if (entry.class == 'conflict-synonym-title collapsible collapsed') {
-                  entry.class = 'conflict-synonym-title collapsible expanded'
-                } else {
-                  entry.class = 'conflict-synonym-title collapsible collapsed'
-                }
-              } else {
-                toggleIt = false
-              }
-            }
-            if (entry.class.indexOf('conflict-result') != -1 && toggleIt) {
-              if (entry.class.indexOf('conflict-result-hidden') != -1) {
-                entry.class = entry.class.replace('conflict-result-hidden', 'conflict-result-displayed')
-              } else {
-                entry.class = entry.class.replace('conflict-result-displayed', 'conflict-result-hidden')
-              }
-            }
-          }
-        }
-        if (bucket == 'cobrsPhonetic') {
-          for (let i = 0; i < this.$store.getters.cobrsPhoneticConflicts.length; i++) {
-            let entry = this.$store.getters.cobrsPhoneticConflicts[i]
-            if (entry.class.indexOf('conflict-cobrs-phonetic-title collapsible') == 0) {
-              if (entry.text == option.text) {
-                toggleIt = true
-                if (entry.class == 'conflict-cobrs-phonetic-title collapsible collapsed') {
-                  entry.class = 'conflict-cobrs-phonetic-title collapsible expanded'
-                } else {
-                  entry.class = 'conflict-cobrs-phonetic-title collapsible collapsed'
-                }
-              } else {
-                toggleIt = false
-              }
-            }
-            if (entry.class.indexOf('conflict-result') != -1 && toggleIt) {
-              if (entry.class.indexOf('conflict-result-hidden') != -1) {
-                entry.class = entry.class.replace('conflict-result-hidden', 'conflict-result-displayed')
-              } else {
-                entry.class = entry.class.replace('conflict-result-displayed', 'conflict-result-hidden')
-              }
-            }
-          }
-        }
-        if (bucket == 'phonetic') {
-          for (let i = 0; i < this.$store.getters.phoneticConflicts.length; i++) {
-            let entry = this.$store.getters.phoneticConflicts[i]
-            if (entry.class.indexOf('conflict-phonetic-title collapsible') == 0) {
-              if (entry.text == option.text) {
-                toggleIt = true
-                if (entry.class == 'conflict-phonetic-title collapsible collapsed') {
-                  entry.class = 'conflict-phonetic-title collapsible expanded'
-                } else {
-                  entry.class = 'conflict-phonetic-title collapsible collapsed'
-                }
-              } else {
-                toggleIt = false
-              }
-            }
-            if (entry.class.indexOf('conflict-result') != -1 && toggleIt) {
-              if (entry.class.indexOf('conflict-result-hidden') != -1) {
-                entry.class = entry.class.replace('conflict-result-hidden', 'conflict-result-displayed')
-              } else {
-                entry.class = entry.class.replace('conflict-result-displayed', 'conflict-result-hidden')
-              }
-            }
-          }
-        }
-      },
-      check_deselect() {
-        if (this.$store.getters.currentConflict === this.selectedConflict) {
-          this.selectedConflict = '';
-        }
-      },
-      setConflictInfo() {
-        if (this.selectedConflict != '')
-          this.$store.dispatch('getConflictInfo', this.selectedConflict);
-      },
-      setSelectedConflict() {
-        // find first actual result in list - looking for exact match
-        let exactMatch = this.conflictData.find(obj => {
-          return obj.class.indexOf('conflict-exact-match') >= 0;
-        });
-
-        if (this.$store.getters.currentConflict == null && this.conflictData && exactMatch !== undefined) {
-          this.selectedConflict = {
-            class: exactMatch.class,
-            text: exactMatch.text,
-            highlightedText: exactMatch.highlightedText,
-            source: exactMatch.source,
-            nrNumber: exactMatch.nrNumber
-          }
-        }
-        else if (this.$store.getters.currentConflict != null) {
-          this.selectedConflict = this.$store.getters.currentConflict;
-        }
+      this.addListener()
+      this.$root.$on('addconflictlistener', () => {
+        this.addListener()
+      })
+      this.$root.$on('removeconflictlistener', () => {
+        this.removeListener()
+      })
+      this.$root.$on('setconflictfocus', (area) => {
+        this.focus = area
+      })
+      if (this.$store.state.conflictsReturnedStatus) {
+        this.setInitialFocus()
       }
-
+    },
+    beforeDestroy() {
+      this.removeListener()
+    },
+    computed: {
+      ...mapGetters([
+        'cobrsPhoneticConflicts',
+        'exactMatchesConflicts',
+        'is_making_decision',
+        'phoneticConflicts',
+        'selectedConflictID',
+        'expandedConflictID',
+        'selectedConflicts',
+        'openBucket',
+        'synonymMatchesConflicts',
+        'conflictTitles',
+      ]),
+      containerDivEl() {
+        let el = document.getElementById('conflicts-container')
+        if (el) return el
+        return null
+      },
+      expandedID: {
+        get() {
+          return this.expandedConflictID
+        }, set(id) {
+          this.$store.commit('setExpandedConflictID', id)
+        }
+      },
+      lastIndex() {
+        if (this.conflictTitles && this.conflictTitles.length > 0) {
+          for (let i = this.conflictTitles.length - 1; i >= 0; i--) {
+            if (this.conflictTitles[i].count > 0) return i
+            return null
+          }
+        }
+      },
+      openBucketIndex: {
+        get() {
+          return this.openBucket
+        }, set(item) {
+          this.$store.commit('setOpenBucket', item)
+        }
+      },
+      selectedNRs() {
+        if (this.selectedConflicts && this.selectedConflicts.length > 0) {
+          return this.selectedConflicts.map(conflict => conflict.nrNumber)
+        }
+      },
     },
     watch: {
-      selectedConflict: {
-        handler(value) {
-          if (value && value.source)
-            this.$store.commit('currentConflict', value);
-          else
-            this.$store.commit('currentConflict', null);
-          this.setConflictInfo();
+      conflictTitles(newData) {
+        this.setInitialFocus(newData)
+      },
+    },
+    methods: {
+      addListener() {
+        if (!this.listener) {
+          this.listener = document.addEventListener('keydown', this.handleKeyboardEvent)
         }
       },
-      conflictData: {
-        handler() {
-          this.$store.commit('currentConflict', null);
-          this.setSelectedConflict();
+      clickBucket(match, index) {
+        this.expandedID = null
+        if (this.openBucketIndex && index === this.openBucketIndex) {
+          this.children = null
+          this.index = this.openBucketIndex
+          this.openBucketIndex = null
+          this.childIndex = 0
+          return
         }
-      }
+        this.children = this.conflictTitles[index].children
+        this.childIndex = 0
+        this.index = null
+        this.openBucketIndex = index
+      },
+      clickChild(match, index) {
+        this.$store.dispatch('getConflictInfo', match)
+        this.expandedID = null
+        this.childIndex = index
+        this.expandedID = match.id
+      },
+      clickExactMatch(match, index) {
+        this.$store.dispatch('getConflictInfo', match)
+        this.openBucketIndex = null
+        this.childIndex = 0
+        this.index = index
+        this.expandedID = match.id
+      },
+      formatDate(d) {
+        return moment(d).format('YYYY-MM-DD')
+      },
+      handleKeyboardEvent(event) {
+        let list
+        if (this.focus !== 'conflicts') {
+          list = ['Tab']
+        } else {
+          list = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Tab']
+        }
+        if (list.includes(event.code)) {
+          event.preventDefault()
+          switch (event.code) {
+
+            case 'ArrowDown':
+              const moveDown = () => {
+                for (let i = this.index + 1; i < this.conflictTitles.length; i++) {
+                  if (this.conflictTitles[i].count > 0 || this.conflictTitles.nrNumber) {
+                    this.index = i
+                    let { id } = this.conflictTitles[i]
+                    this.scrollIntoView(id)
+                    return true
+                  }
+                }
+                return false
+              }
+              this.expandedID = null
+              if (this.openBucketIndex) {
+                if (this.childIndex < this.children.length - 1) {
+                  this.childIndex++
+                  let { id } = this.children[this.childIndex]
+                  this.scrollIntoView(id)
+                  return
+                }
+                if (this.childIndex >= this.children.length - 1) {
+                  if (this.openBucketIndex === this.lastIndex) return
+                  this.index = this.openBucketIndex
+                  this.openBucketIndex = null
+                  this.children = null
+                  this.childIndex = 0
+                  moveDown()
+                }
+                return
+              }
+              moveDown()
+              return
+
+            case 'ArrowUp':
+              this.expandedID = null
+              if (this.openBucketIndex !== null) {
+                if (this.childIndex > 0) {
+                  this.childIndex--
+                  let { id } = this.children[this.childIndex]
+                  this.scrollIntoView(id)
+                  return
+                }
+                this.index = this.openBucketIndex
+                this.openBucketIndex = null
+                this.children = null
+                this.scrollIntoView(this.conflictTitles[this.index].id)
+              }
+              for (let i = this.index - 1; i >= 0; i--) {
+                if (this.conflictTitles[i].count > 0 || this.conflictTitles[i].nrNumber) {
+                  this.index = i
+                  let { id } = this.conflictTitles[i]
+                  this.scrollIntoView(id)
+                  return
+                }
+              }
+              return
+
+            case 'ArrowLeft':
+              if (this.expandedID !== null) {
+                this.expandedID = null
+                return
+              }
+              if (this.openBucketIndex !== null) {
+                this.index = this.openBucketIndex
+                this.scrollIntoView(this.conflictTitles[this.index].id)
+                this.openBucketIndex = null
+                this.children = null
+                this.childIndex = 0
+              }
+              return
+
+            case 'ArrowRight':
+              if (this.openBucketIndex !== null) {
+                let item = this.children[this.childIndex]
+                this.$store.dispatch('getConflictInfo', item)
+                this.expandedID = item.id
+                this.scrollIntoView(item.id)
+                return
+              }
+              if (this.index && this.conflictTitles[this.index].nrNumber) {
+                let item = this.conflictTitles[this.index]
+                this.$store.dispatch('getConflictInfo', item)
+                this.expandedID = item.nrNumber
+                this.scrollIntoView(item.id)
+                return
+              }
+              this.openBucketIndex = this.index
+              this.children = this.conflictTitles[this.index].children
+              this.index = null
+              this.childIndex = 0
+              return
+
+            case 'Space':
+              //if child menu is open, then children[childIndex] must be conflict-result
+              if (this.children) {
+                this.setCheckbox(this.children[this.childIndex])
+                return
+              }
+              if (this.openBucketIndex === null) {
+                //if no open bucket, only an exact-match will have a checkbox.
+                //exact-matches are the only item not rendered under a title with a nrNumber.
+                if (this.conflictTitles[this.index].nrNumber) {
+                  this.setCheckbox(this.conflictTitles[this.index])
+                }
+              }
+              return
+
+            case 'Tab':
+              this.setFocus()
+              return
+          }
+        } else {
+          return event
+        }
+      },
+      removeListener() {
+        document.removeEventListener('keydown', this.handleKeyboardEvent)
+        this.listener = null
+      },
+      scrollIntoView(id) {
+        console.log('is it this?')
+        this.$nextTick(function() {document.getElementById(id).scrollIntoViewIfNeeded() })
+      },
+      setCheckbox(option) {
+        let conflictsCopy = [...this.selectedConflicts]
+        let index = this.selectedConflicts.findIndex(conflict => conflict.nrNumber === option.nrNumber)
+        if (index === -1) {
+          conflictsCopy.push(option)
+        } else {
+          conflictsCopy.splice(index, 1)
+        }
+        this.$store.commit('setSelectedConflicts', conflictsCopy)
+      },
+      setFocus(area) {
+        if (!area) {
+          if (this.focus === 'conflicts') area = 'regular'
+          if (this.focus === 'regular') area = 'exact'
+          if (this.focus === 'exact') area = 'conflicts'
+        }
+        if (area === 'regular') {
+          this.$root.$emit('setcompnamefocus', 'regularsearchfield')
+          this.focus = 'regular'
+          return
+        }
+        if (area === 'exact') {
+          this.$root.$emit('setcompnamefocus', 'exactsearchfield')
+          this.focus = 'exact'
+          return
+        }
+        if (area === 'conflicts') {
+          this.$root.$emit('setcompnamefocus', 'blur')
+          this.focus = 'conflicts'
+          return
+        }
+      },
+      setInitialFocus(newData=this.conflictTitles) {
+        for (let i = 0; i < newData.length; i++) {
+          if (newData[i].nrNumber) {
+            this.children = null
+            this.index = i
+            this.focus = 'conflicts'
+            this.openBucketIndex = null
+            this.setExactMatchesOnLoad()
+            this.$root.$emit('setcompnamefocus', 'blur')
+            this.scrollIntoView(newData[i].id)
+            return
+          }
+          if (newData[i].count > 0) {
+            this.childIndex = 0
+            this.children = newData[i].children
+            this.openBucketIndex = i
+            this.focus = 'conflicts'
+            this.index = null
+            this.$root.$emit('setcompnamefocus', 'blur')
+            this.scrollIntoView(newData[i].children[0].id)
+            return
+          }
+          this.openBucketIndex = null
+          this.children = null
+          this.index = null
+          this.setFocus('regular')
+        }
+      },
+      setExactMatchesOnLoad() {
+        let selectedConflictsCopy = [...this.selectedConflicts]
+        for (let title of this.conflictTitles) {
+          if (title.nrNumber) {
+            if (!this.selectedConflicts.find(conflict => conflict.nrNumber === title.nrNumber)) {
+              if (selectedConflictsCopy.length >= 3) break
+              selectedConflictsCopy.push(title)
+            }
+          }
+        }
+        this.$store.commit('setSelectedConflicts', selectedConflictsCopy)
+      },
     }
   }
 </script>
 
 <style scoped>
-  #conflict-list {
-    overflow-y: scroll !important;
-    max-height: 480px !important;
+  .conflict-container-spinner:not(.hidden) ~ .exact-match-layout,
+  .conflict-container-spinner:not(.hidden) ~ .zero-count-title-layout,
+  .conflict-container-spinner:not(.hidden) ~ .bucket-list,
+  .conflict-container-spinner:not(.hidden) ~ .title-layout {
+    display: none;
   }
 
-  .cobrs-phonetic-match-title {
-    padding-left: 5px !important;
-    height: 32px !important;
+  .cursor-pointer, .title-match, .bucket-list {
+    cursor: pointer !important;
+  }
+
+  .container-style {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-weight: 400;
+    font-size: 15px;
+    height: 445px;
+    max-height: 445px;
+    overflow-y: scroll;
   }
 
   .conflict-cobrs-phonetic-title {
@@ -453,7 +481,8 @@
   }
 
   .conflict-no-match {
-    color: #CCC;
+    color: var(--l-grey);
+    height: 32px !important;
   }
 
   .conflict-phonetic-title {
@@ -469,23 +498,8 @@
     color: #38598a;
   }
 
-  .conflict-result, .conflict-no-match {
-    padding: 5px;
-    padding-left: 40px;
-    height: 32px !important;
-  }
-
-  .conflict-result-displayed {
-	  display:block
-  }
-
-  .conflict-result-hidden {
-	  display:none
-  }
-
-  .conflict-result-selected {
-	  background-color: #3979bd;
-	  color: white;
+  .conflict-highlighted {
+    background-color: #dceffa;
   }
 
   .conflict-synonym-title {
@@ -497,49 +511,16 @@
     font-weight: 400;
   }
 
-  .conflict-title {
-	  font-weight: 600;
-  }
-
-  .exact-match-title, .synonym-match-title, .cobrs-phonetic-match-title, .phonetic-match-title {
+  .conflict-heading {
     background-color: var(--l-grey);
     font-weight: 600;
-    padding: 5px 8px 5px 20px;
+    padding: 5px 8px 5px 8px;
     color: var(--text);
     margin-bottom: 1px;
   }
 
-  .phonetic-match-title {
-    padding: 5px;
-    margin-top: 5px;
+  .shift-up {
     position: relative;
-  }
-
-  .spinner-wrapper:not(.hidden) + .conflict-no-match {
-    display: none;
-  }
-
-  .conflict-result-displayed:hover {
-    cursor: pointer !important;
-  }
-
-  .synonym-match-title {
-    background-color: var(--l-grey);
-    margin-top: 0;
-  }
-
-  /* when selected, highlight synonym matches in blue */
-  #conflict-list option.conflict-result:checked {
-    background: #b3d9ff linear-gradient(0deg, #b3d9ff 0%, #b3d9ff 100%);
-  }
-  #conflict-list:focus option.conflict-result:checked {
-    background: #3979bd linear-gradient(0deg, #3979bd 0%, #3979bd 100%);
-  }
-  /* when selected, highlight exact match in red */
-  #conflict-list option.conflict-exact-match:checked {
-    background: #ff9999 linear-gradient(0deg, #ff9999 0%, #ff9999 100%);
-  }
-  #conflict-list:focus option.conflict-exact-match:checked {
-    background: red linear-gradient(0deg, red 0%, red 100%);
+    top: -4px !important;
   }
 </style>

@@ -1,6 +1,6 @@
 <!--eslint-disable-->
 <template>
-  <v-layout wrap>
+  <v-layout wrap ref="CompName">
 
     <!--NAME CHOICES LIST-->
     <v-flex lg6 bg-white py-2>
@@ -80,29 +80,24 @@
       </v-layout>
     </v-flex>
 
-    <template v-if="is_making_decision">
-      <v-flex lg12 ma-0 pa-0>
-        <Decision />
-      </v-flex>
-    </template>
-
     <!--EXAMINATION AREA:  RECIPE CARDS / DECISION INFO-->
-    <template v-if="!is_making_decision && !is_complete">
+    <template v-if="!is_complete">
 
       <!--LEFT COLUMN:  CONFLICTS/CONDITIONS/HISTORY/TRADEMARKS LISTS-->
       <v-flex lg6 py-4 pl-5 bg-grey>
         <v-layout>
 
-          <!--BASIC SEARCH FIELD-->
-          <v-flex grow mr-3>
+          <v-flex lg8 mr-3>
             <v-form @submit.prevent="onSubmit" id="regular-search-form">
               <div style="display: flex;">
                 <v-text-field @click:append.prevent="resetSearchStr"
                               @shortkey="setFocus"
+                              @focus="$root.$emit('setconflictfocus', 'regular')"
+                              @blur="$root.$emit('setconflictfocus', 'conflicts')"
                               :append-icon="searchStr !== currentName ? 'clear' : ''"
                               autocomplete="off"
                               class="examine-search"
-                              ref="search"
+                              ref="regularsearchfield"
                               id="regular-search-field"
                               v-model="searchStr"
                               v-shortkey="['alt', 's']"/>
@@ -121,16 +116,18 @@
           </v-flex>
 
           <!--EXACT MATCH SEARCH FIELD-->
-          <v-flex shrink ml-3>
+          <v-flex lg4>
             <v-form @submit.prevent="onSubmit" id="exact-search-form">
               <div style="display: flex;">
-                <div style="width: 240px">
+                <div style="width: 100%">
                   <v-text-field @click:append="resetExactSearchStr"
                                 :append-icon="exactPhrase ? 'clear' : ''"
                                 autocomplete="off"
+                                @focus="$root.$emit('setconflictfocus', 'exact')"
+                                @blur="$root.$emit('setconflictfocus', 'conflicts')"
                                 class="examine-search"
                                 placeholder="exact phrase"
-                                ref="advanced-search"
+                                ref="exactsearchfield"
                                 id="exact-search-field"
                                 name="exact-search"
                                 v-model="exactPhrase" />
@@ -148,6 +145,7 @@
               </div>
             </v-form>
           </v-flex>
+
         </v-layout>
         <v-layout mt-3 wrap>
           <v-flex ma-0 pa-0>
@@ -158,8 +156,7 @@
 
       <!--RIGHT TWO COLUMNS: EXAMINATION AREA INFO-->
       <v-flex lg6 py-4 bg-grey>
-        <ConflictInfo v-if="currentRecipeCard === 'Conflicts'" />
-        <HistoryInfo v-if="currentRecipeCard === 'History'" />
+        <Decision v-if="is_making_decision" />
       </v-flex>
     </template>
   </v-layout>
@@ -226,12 +223,19 @@
       if (this.$store.getters.nrNumber == null) {
         this.$store.dispatch('getpostgrescompNo');
       }
-      this.setFocus();
       // set manual search string based on current name - fixes bug related to leaving
       // and coming back to same NR
       this.searching = true;
       this.setManualSearchStr(this.currentName);
       this.exactPhrase = '';
+      this.$root.$on('setcompnamefocus', (ref) => {
+        if (ref === 'blur') {
+          this.$refs.exactsearchfield.blur()
+          this.$refs.regularsearchfield.blur()
+        } else {
+          this.focusRef(ref)
+        }
+      })
     },
     computed: {
       canCancel() {
@@ -340,7 +344,7 @@
 
         if (undoable) {
           // if name choice 3 has not been decided, then 2 is undoable
-          if (this.compName3.state == 'NE' || this.compName3.state == null) {
+          if (this.compName3.state == 'NE' || this.compName3.state == null ) {
             undoable = true;
           }
           else undoable = false;
@@ -361,14 +365,7 @@
         return this.$store.getters.listDecisionReasons;
       },
       showQuickButtons() {
-        if (this.userIsAnExaminer &&
-          !this.is_making_decision &&
-          !this.is_complete &&
-          this.is_my_current_nr &&
-          !this.is_name_decision_made) {
-          return true
-        }
-        return false
+        return !this.is_complete && this.is_making_decision && this.userIsAnExaminer
       },
       userCanEdit() {
         return this.$store.getters.userHasEditRole;
@@ -436,6 +433,9 @@
         }
         return classes
       },
+      focusRef(ref) {
+        this.$refs[ref].focus()
+      },
       is_undoable(name) {
 
         // if the NR is closed in any way, a name is not undoable - the NR will have to be
@@ -463,7 +463,7 @@
         // send decision to API and reset flags
         this.$store.dispatch('nameAcceptReject');
         this.decision_made = null;
-        this.is_making_decision = false;
+        this.is_making_decision = true;
       },
       onSubmit(event) {
         if (event.target.id && event.target.id.includes('exact-search')) {
@@ -547,16 +547,10 @@
 
 
 <style scoped>
-  .bg-grey {
-    background-color: var(--xl-grey);
-  }
 
-  .bg-white {
-    background-color: white;
-  }
 
-  .fs-20 {
-    font-size: 20px !important;
+  .examine-search:focus-within {
+    box-shadow: 0px 5px 10px -5px var(--cyan) !important;
   }
 
   .name-option {

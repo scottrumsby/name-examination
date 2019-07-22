@@ -84,6 +84,23 @@ body {
   color: var(--link) !important;
 }
 
+.bg-grey {
+  background-color: var(--xl-grey);
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.fs-20 {
+  font-size: 20px !important;
+}
+
+.fs-24 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
 .c-priority {
   color: var(--priority) !important;
 }
@@ -200,6 +217,10 @@ body {
 
 .theme--light.v-table tbody tr[active] {
   background-color: var(--xl-cyan) !important;
+}
+
+.theme--light.v-input--is-disabled textarea {
+  color: var(--text) !important;
 }
 
 .message-to-request .v-messages {

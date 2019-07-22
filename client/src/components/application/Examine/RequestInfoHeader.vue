@@ -2,7 +2,7 @@
 <template>
   <v-flex>
     <!--1st ROW - NR NUMBER / JURISDICTION / BUTTONS -->
-    <v-container fluid mt-2 pa-0 :class="is_expanded || is_editing ? 'grey-bg' : ''">
+    <v-container fluid mt-2 pa-0 :class="is_expanded || is_editing ? 'bg-grey' : ''">
       <v-layout align-start pb-2 row>
         <!--NR NUMBER-->
         <v-flex :class="['nr-number', 'text-left',  'mx-4', priority ? 'rejected' : 'dk-grey']" shrink>
@@ -20,6 +20,7 @@
                         class="jurisdiction-dropdown"
                         attach
                         flat
+                        attach
                         dense
                         v-model="requestType" />
             </v-flex>
@@ -32,6 +33,7 @@
                           attach
                           class="jurisdiction-dropdown"
                           flat
+                          attach
                           dense
                           @input="$v.jurisdiction.$touch()" />
               </v-flex>
@@ -88,13 +90,13 @@
         </v-flex>
 
         <!--COL 2:  Dates/Expiry -->
-        <v-flex :style="{maxWidth: '280px'}"
-                fs-15
-                :ml-2="is_expanded">
+        <v-flex :ml-2="is_expanded"
+                :style="{maxWidth: '280px'}"
+                fs-15>
           <v-layout column>
             <v-flex><b>Submit:</b> {{ formatDate(submittedDate) }}</v-flex>
             <template v-if="$store.getters.decision_made">
-              <v-flex :class="!$store.getters.decision_made ? 'grey--text' : ''">
+              <v-flex :class="!$store.getters.decision_made ? 'c-grey' : ''">
                 <b>Decision:</b> {{ $store.getters.decision_made ? $store.getters.decision_made : 'n/a' }}
               </v-flex>
             </template>
@@ -124,13 +126,13 @@
                       <v-flex lg8 fs-14 ft-ital pl-3>YYYY-MM-DD</v-flex>
                     </v-layout >
                     <v-flex v-if="!$v.expiryDateForEdit.required">Expiry Date is required.</v-flex>
-                    <v-flex class="error color-red" v-else-if="!$v.expiryDateForEdit.isActualDate">
+                    <v-flex class="error c-priority" v-else-if="!$v.expiryDateForEdit.isActualDate">
                       This is not an actual date. Date must be in format YYYY-MM-DD.
                     </v-flex>
-                    <v-flex class="error color-red" v-if="!$v.expiryDateForEdit.isValidFormat" >
+                    <v-flex class="error c-priority" v-if="!$v.expiryDateForEdit.isValidFormat" >
                       Date must be in format YYYY-MM-DD.
                     </v-flex >
-                    <v-flex class="error color-red" v-if="!$v.expiryDateForEdit.isFutureDate">
+                    <v-flex class="error c-priority" v-if="!$v.expiryDateForEdit.isFutureDate">
                       Expiry Date must be in the future.
                     </v-flex>
                   </v-layout>
@@ -914,15 +916,6 @@
     left: -60px;
   }
 
-  .color-red {
-    color: red !important;
-  }
-
-  .grey-bg {
-    background-color: var(--xl-grey) !important;
-    margin-bottom: 0 !important;
-  }
-
   .info-banner-collapsed {
     background-color: var(--xl-grey);
     height: 135px;
@@ -956,9 +949,5 @@
     min-width: 210px;
     font-size: 34px;
     font-weight: 600;
-  }
-
-  .request-type {
-    font-size: 24px;
   }
  </style>

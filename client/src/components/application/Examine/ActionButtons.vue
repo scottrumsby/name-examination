@@ -28,7 +28,7 @@
              v-shortkey="['alt', 'n']"
              @shortkey="getNextCompany()"
              id="examine-get-next-button"
-             v-if="userIsAnExaminer && !is_making_decision && !is_my_current_nr"
+             v-if="userIsAnExaminer && !is_my_current_nr"
              @click="getNextCompany()"><img src="/static/images/buttons/get-next.png" /></v-btn>
 
       <!-- CANCEL button -->
@@ -44,27 +44,10 @@
              v-shortkey="['alt', 'h']"
              @shortkey="holdRequest()"
              id="examine-hold-button"
-             v-if="!is_making_decision && is_my_current_nr"
+             v-if="is_my_current_nr"
              @click="holdRequest()"><img src="/static/images/buttons/hold-req.png"/></v-btn>
 
-      <!-- DECISION button -->
-      <v-btn flat
-             class="mx-1 pa-0 action-button"
-             v-shortkey="['alt', 'd']"
-             @shortkey="startDecision()"
-             id="examine-decide-button"
-             v-if="userIsAnExaminer && !is_making_decision && !is_complete && is_my_current_nr && !is_name_decision_made"
-             @click="startDecision()"><img src="/static/images/buttons/decision.png"/></v-btn>
-
       <!-- ACCEPT/REJECT/CANCEL DECISION buttons -->
-
-      <v-btn flat
-             v-shortkey="['alt', 'c']"
-             @shortkey="is_making_decision=false"
-             class="ma-0 pa-0 action-button"
-             id="decision-cancel-button"
-             v-if="is_making_decision"
-             @click="is_making_decision=false"><img src="/static/images/buttons/dec-back.png"/></v-btn>
 
       <!-- RE-OPEN (un-furnished) button -->
       <v-btn flat
@@ -196,8 +179,6 @@ export default {
       let expired_date = moment(this.$store.state.expiryDate, 'YYYY-MM-DD').clone();
       let today = new moment();
 
-
-
       if (this.$store.getters.currentState === 'APPROVED' && today.isAfter(expired_date)) return true;
       return false;
     },
@@ -261,13 +242,17 @@ export default {
     },
     claimNR() {
       this.$store.dispatch('updateNRState', 'INPROGRESS');
+      this.startDecision()
     },
     getNextCompany() {
       this.$store.dispatch('resetValues');
       this.$store.dispatch('getpostgrescompNo');
+      this.$store.dispatch('resetConflictList')
     },
     holdRequest() {
+      this.is_making_decision = false
       this.$store.dispatch('updateNRState', 'HOLD');
+      this.$store.dispatch('resetConflictList')
     },
     reOpen() {
       /* Workflow:
@@ -326,6 +311,8 @@ export default {
       }
     },
     startDecision() {
+      this.$store.commit('setSelectedConflictID', null)
+      this.$store.commit('setExpandedConflictID', null)
       this.is_making_decision = true
     },
     toggleCancelModal(action) {

@@ -113,6 +113,9 @@
       historyInfo() {
         return this.$store.getters.historiesJSON
       },
+      is_making_decision() {
+        return this.$store.getters.is_making_decision
+      },
       phoneticConflicts() {
         return this.$store.getters.phoneticConflicts
       },
