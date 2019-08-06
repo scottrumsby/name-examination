@@ -127,14 +127,14 @@ describe('PhoneticMatches', () => {
     })
 
     it('displays phonetic-match conflicts', () => {
-      expect(data.vm.$el.querySelector('#conflict-list').textContent).toContain('INKREDABLE STEPS RECORDS, INC.')
+      expect(data.vm.$el.querySelector('#conflicts-container').textContent).toContain('INCREDYBLE STEPS RECORDS, INC')
 
       // expect not to see spinner and results at the same time
-      expect(data.vm.$el.querySelector('#conflict-list .phonetic-match-spinner').classList.contains('hidden'));
+      expect(data.vm.$el.querySelector('#conflicts-container .conflict-container-spinner').classList.contains('hidden'));
     })
 
     it('displays phonetic-match conflicts after cobrs-phonetic match list', () => {
-      var content = data.vm.$el.querySelector('#conflict-list').textContent.trim()
+      var content = data.vm.$el.querySelector('#conflicts-container').textContent.trim()
 
       expect(content.indexOf('INCREDYBLE STEPS RECORDS, INC.')).not.toEqual(-1)
       expect(content.indexOf('Phonetic Match (experimental)')).not.toEqual(-1)
@@ -142,41 +142,63 @@ describe('PhoneticMatches', () => {
     })
 
     it('populates additional attributes as expected', () => {
-      expect(data.instance.$store.state.phoneticConflicts).toEqual([
-        {
+      expect(data.instance.$store.state.phoneticConflicts).toEqual([{
+          "children": [],
           "class": "conflict-phonetic-title",
           "count": 0,
           "highlightedText": "INCREDIBLE NAME INC",
+          "id": "0-phonetic",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE NAME INC"
-        },
-        {
+        }, {
+          "children": [],
           "class": "conflict-phonetic-title",
           "count": 0,
           "highlightedText": "INCREDIBLE NAME",
+          "id": "1-phonetic",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE NAME"
-        },
-        {
-          "class": "conflict-phonetic-title collapsible collapsed",
+        }, {
+          "children": [{
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "INKREDABLE STEPS RECORDS, INC.",
+            "id": "3-phonetic",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0893638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "INKREDABLE STEPS RECORDS, INC."
+          }],
+          "class": "conflict-phonetic-title",
           "count": 1,
           "highlightedText": "INCREDIBLE",
+          "id": "2-phonetic",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE"
-        },
-        {
-          "class": "conflict-result conflict-result-hidden",
+        }, {
+          "class": "conflict-result",
           "count": 0,
           "highlightedText": "INKREDABLE STEPS RECORDS, INC.",
+          "id": "3-phonetic",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": "0893638",
           "source": "CORP",
+          "startDate": undefined,
           "text": "INKREDABLE STEPS RECORDS, INC."
         }]
       )

@@ -79,6 +79,25 @@ describe('CobrsPhoneticMatches', () => {
           })
         })
       )
+      data.apiSandbox.getStub.withArgs('/api/v1/requests/phonetics/incredible name inc/*', sinon.match.any)
+        .returns(new Promise((resolve) => {
+          resolve({
+            data: {
+              names: [{
+                name_info: { name: '----INCREDIBLE NAME INC - meta1' },
+                stems: []
+              }, {
+                name_info: { name: '----INCREDIBLE NAME - meta2' },
+                stems: []
+              }, { name_info: { name: '----INCREDIBLE - meta3' }, stems: [] }, {
+                name_info: {
+                  id: "0693638", name: "INCREDIBLE STEPS RECORDS, INC.", score: 1.0, source: "CORP"
+                }, stems: []
+              }]
+            }
+          })
+        })
+      )
       data.apiSandbox.getStub.withArgs('/api/v1/requests/cobrsphonetics/incredible name inc/*', sinon.match.any).returns(
         new Promise((resolve) => {
           resolve({
@@ -114,14 +133,13 @@ describe('CobrsPhoneticMatches', () => {
     })
 
     it('displays cobrs-phonetic-match conflicts', () => {
-      expect(data.vm.$el.querySelector('#conflict-list').textContent).toContain('INCREDYBLE STEPS RECORDS, INC.')
-
-      // expect not to see spinner and results at the same time
-      expect(data.vm.$el.querySelector('#conflict-list .cobrs-phonetic-match-spinner').classList.contains('hidden'));
+      expect(data.vm.$el.querySelector('#conflicts-container .conflict-container-spinner').classList.contains('hidden'));
+      
     })
 
     it('displays cobrs-phonetics conflicts after synonym bucket list', () => {
-      var content = data.vm.$el.querySelector('#conflict-list').textContent.trim()
+      var content = data.vm.$el.querySelector('#conflicts-container').textContent.trim()
+      console.log(content)
       expect(content.indexOf('INCREDIBLE STEPS RECORDS, INC.')).not.toEqual(-1)
       expect(content.indexOf('Character Swap Match')).not.toEqual(-1)
       expect(content.indexOf('INCREDIBLE STEPS RECORDS, INC.') < content.indexOf('Character Swap Match')).toEqual(true)
@@ -130,41 +148,70 @@ describe('CobrsPhoneticMatches', () => {
     it('populates additional attributes as expected', () => {
       expect(data.instance.$store.state.cobrsPhoneticConflicts).toEqual([
         {
+          "children": [],
           "class": "conflict-cobrs-phonetic-title",
           "count": 0,
           "highlightedText": "INCREDIBLE NAME INC",
+          "id": "0-cobrs",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE NAME INC"
         },
         {
+          "children": [],
           "class": "conflict-cobrs-phonetic-title",
           "count": 0,
           "highlightedText": "INCREDIBLE NAME",
+          "id": "1-cobrs",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE NAME"
         },
         {
-          "class": "conflict-cobrs-phonetic-title collapsible collapsed",
+          "children": [
+            {
+              "class": "conflict-result",
+              "count": 0,
+              "highlightedText": "INCREDYBLE STEPS RECORDS, INC.",
+              "id": "3-cobrs",
+              "jurisdiction": undefined,
+              "meta": undefined,
+              "nrNumber": "0793638",
+              "source": "CORP",
+              "startDate": undefined,
+              "text": "INCREDYBLE STEPS RECORDS, INC."
+            }
+          ],
+          "class": "conflict-cobrs-phonetic-title",
           "count": 1,
           "highlightedText": "INCREDIBLE",
+          "id": "2-cobrs",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE"
         },
         {
-          "class": "conflict-result conflict-result-hidden",
+          "class": "conflict-result",
           "count": 0,
           "highlightedText": "INCREDYBLE STEPS RECORDS, INC.",
+          "id": "3-cobrs",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": "0793638",
           "source": "CORP",
+          "startDate": undefined,
           "text": "INCREDYBLE STEPS RECORDS, INC."
-        }])
+        }
+      ])
     })
 
     it('changes conflicts tab to red', (done) => {
@@ -235,7 +282,7 @@ describe('CobrsPhoneticMatches', () => {
         sessionStorage.setItem('AUTHORIZED', true)
         router.push('/nameExamination')
         setTimeout(() => {
-          expect(document.getElementById('conflicts1').className).toMatch('c-accepted')
+          expect(document.getElementById('conflicts1').className).toContain('c-priority')
           done();
         }, 1000)
       }, 1000)

@@ -13,6 +13,7 @@ Vue.use(require('vue-shortkey'))
 
 describe('CompName.vue', () => {
   let instance;
+  console.log('very first')
   
   beforeEach(() => {
     const Constructor = Vue.extend(CompName);
@@ -63,6 +64,7 @@ describe('CompName.vue', () => {
     });
     
     it('shares your oldest NR', () => {
+      console.log('shares your oldest NR')
       expect(vm.$store.getters.nrNumber).toEqual('NR 1234');
     });
     
@@ -179,9 +181,11 @@ describe('CompName.vue', () => {
     });
     
     it('hides quick-approve, and reject buttons for an IN PROGRESS NR of another examiner', () => {
-      expect(vm.$el.querySelector('#examine-quick-approve-button')).toBeNull();
-      expect(vm.$el.querySelector('#examine-reject-distinctive-button')).toBeNull();
-      expect(vm.$el.querySelector('#examine-reject-descriptive-button')).toBeNull();
+      vm.$nextTick(function () {
+        expect(vm.$el.querySelector('#examine-quick-approve-button')).toBeNull();
+        expect(vm.$el.querySelector('#examine-reject-distinctive-button')).toBeNull();
+        expect(vm.$el.querySelector('#examine-reject-descriptive-button')).toBeNull();
+      })
     });
   })
   

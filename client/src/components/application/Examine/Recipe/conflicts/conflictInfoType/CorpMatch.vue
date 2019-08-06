@@ -3,8 +3,8 @@
   <v-container pt-0 pb-3 pl-4 fluid align-start>
     <v-layout align-items-start v-if="is_xpro">
       <v-layout wrap style="width: 50%" align-items-start>
-        <v-flex lg5 item-heading mt-4>Type:</v-flex>
-        <v-flex lg7 mt-4>XPRO Corporation</v-flex>
+        <v-flex lg5 item-heading>Type:</v-flex>
+        <v-flex lg7>XPRO Corporation</v-flex>
         <v-flex lg5 mt-3 item-heading>Corp Number:</v-flex>
         <v-flex lg7 mt-3>{{ incorpNum }}</v-flex>
         <v-flex lg5 mt-3 item-heading>Attorneys:</v-flex>
@@ -36,8 +36,8 @@
     </v-layout>
     <v-layout align-items-start v-else>
       <v-layout wrap style="width: 45%" align-items-start>
-        <v-flex lg5 item-heading mt-4>Type:</v-flex>
-        <v-flex lg7 mt-4>BC Corporation</v-flex>
+        <v-flex lg5 item-heading>Type:</v-flex>
+        <v-flex lg7>BC Corporation</v-flex>
         <v-flex lg5 mt-3 item-heading>Corp Number:</v-flex>
         <v-flex lg7 mt-3>{{ incorpNum }}</v-flex>
         <v-flex lg5 mt-3 item-heading>Directors</v-flex>
@@ -52,8 +52,8 @@
       </v-layout>
 
       <v-layout wrap style="width: 55%;" align-items-start>
-        <v-flex lg5 mt-4 item-heading>Records Office Delivery Address:</v-flex>
-        <v-flex mt-4 pl-2 lg7>
+        <v-flex lg5 item-heading>Records Office Delivery Address:</v-flex>
+        <v-flex pl-2 lg7>
           <div v-if="is_not_available(records_office_delivery_address)">Not Available</div>
           <div v-else v-for="recordsAddressLine in records_office_delivery_address">
             {{ recordsAddressLine }}
@@ -102,6 +102,11 @@
             output = [lines[r], ...output]
           }
           output.push(lastLine)
+          if (output[0].toUpperCase() === 'N' && output[1].toUpperCase() === 'O' && output[2].toUpperCase() === 'T') {
+            output = [
+              'Address not', 'available'
+            ]
+          }
           return output
         } else {
           return null
@@ -141,6 +146,11 @@
             output = [lines[r], ...output]
           }
           output.push(lastLine)
+          if (output[0].toUpperCase() === 'N' && output[1].toUpperCase() === 'O' && output[2].toUpperCase() === 'T') {
+            output = [
+              'Address not', 'available'
+            ]
+          }
           return output
         } else {
           return null
@@ -156,6 +166,11 @@
             output = [lines[r], ...output]
           }
           output.push(lastLine)
+          if (output[0].toUpperCase() === 'N' && output[1].toUpperCase() === 'O' && output[2].toUpperCase() === 'T') {
+            output = [
+              'Address not', 'available'
+            ]
+          }
           return output
         } else {
           return null

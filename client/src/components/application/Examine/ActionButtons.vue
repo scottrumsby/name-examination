@@ -67,6 +67,8 @@
       <v-btn flat
              class="mx-1 pa-0 action-button"
              id="examine-button"
+             v-shortkey="['alt', 'x']"
+             @shortkey="claimNR()"
              v-if="can_claim"
              @click="claimNR()"><img src="/static/images/buttons/examine.png"/></v-btn>
     </v-flex>
@@ -86,6 +88,8 @@
           <div class="modal-body">
               <textarea id="cancel-comment-text"
                         class="form-control"
+                        @focus="$store.emit('setConflictsListenerState', 'disabled')"
+                        @blur="$store.emit('setConflictsListenerState', 'listenAll')"
                         rows="10"
                         v-model="cancel_comment_display"></textarea>
           </div>
@@ -243,6 +247,7 @@ export default {
     claimNR() {
       this.$store.dispatch('updateNRState', 'INPROGRESS');
       this.startDecision()
+      this.$root.$emit('initializeconflicts')
     },
     getNextCompany() {
       this.$store.dispatch('resetValues');
@@ -262,6 +267,11 @@ export default {
        - move to INPROGRESS with edit screen open
        - upon save/cancel, move to DRAFT
        */
+      this.$store.dispatch('resetConflictList')
+      this.$store.commit('setSelectedConditions', [])
+      this.$store.commit('setSelectedConflicts', [])
+      this.$store.commit('setSelectedTrademarks', [])
+      this.$root.$emit('initializeconflicts')
       if (this.userIsAnExaminer) {
         this.$store.commit('currentState', 'INPROGRESS');
       }
@@ -288,6 +298,11 @@ export default {
        - move to INPROGRESS with edit screen open
        - upon save/cancel, move to DRAFT
        */
+      this.$store.dispatch('resetConflictList')
+      this.$store.commit('setSelectedConditions', [])
+      this.$store.commit('setSelectedConflicts', [])
+      this.$store.commit('setSelectedTrademarks', [])
+      this.$root.$emit('initializeconflicts')
       if (this.userIsAnExaminer) {
         this.$store.commit('currentState', 'INPROGRESS');
       }

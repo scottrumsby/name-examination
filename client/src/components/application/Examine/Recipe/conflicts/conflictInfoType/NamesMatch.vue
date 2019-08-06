@@ -1,6 +1,6 @@
 <!--eslint-disable -->
 <template>
-  <v-container pt-0 pb-3 px-3 fluid align-start>
+  <v-container ma-0 pt-0 pb-3 px-3 fluid align-start>
     <v-layout align-items-start>
       <v-layout wrap style="width: 45%" align-items-start>
         <v-flex item-heading>Client</v-flex>

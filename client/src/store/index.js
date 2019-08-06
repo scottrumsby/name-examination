@@ -226,6 +226,7 @@ export default new Vuex.Store({
     parsedPhoneticConflicts: [],
     parsedCOBRSConflicts: [],
     parsedSynonymConflicts: [],
+    conflictsListenerState: 'listenAll',
   },
   mutations: {
     requestType(state, value) {
@@ -862,6 +863,7 @@ export default new Vuex.Store({
     setExpandedConflictID: (state, payload) => state.expandedConflictID = payload,
     setOpenBucket: (state, payload) => state.openBucket = payload,
     setConflictsReturnedStatus: (state, payload) => state.conflictsReturnedStatus = payload,
+    setConflictsListenerState: (state, payload) => state.conflictsListenerState = payload,
     // not used
     setConflicts(state, conflictJSon) {
 
@@ -1154,8 +1156,8 @@ export default new Vuex.Store({
       commit('setExpandedConflictID', null)
       commit('setSelectedConflictID', null)
       commit('setOpenBucket', null)
-      commit('setSelectedConflicts', [])
     },
+    
     logout({ commit, state }) {
 
       commit('clearAuthData')
@@ -1482,22 +1484,23 @@ export default new Vuex.Store({
       commit('is_making_decision', false)
     },
 
-    getConflictInfo({ state, commit }, value) {
+    getConflictInfo({ state, commit, dispatch }, value) {
+      $('.conflict-detail-spinner').removeClass('hidden')
       if (value == null || value.nrNumber == null) {
+        $('.conflict-detail-spinner').addClass('hidden')
         return
       }
-
       commit('currentConflict', value)
       if (value.source == 'CORP') {
         state.corpConflictJSON = null
-        this.dispatch('getCorpConflict', value)
+        dispatch('getCorpConflict', value)
       } else {
         state.namesConflictJSON = null
-        this.dispatch('getNamesConflict', value)
+        dispatch('getNamesConflict', value)
       }
     },
 
-    getNamesConflict({ state, commit }, value) {
+    getNamesConflict({ state, commit, dispatch }, value) {
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/' + value.nrNumber
       const vm = this
@@ -1505,15 +1508,17 @@ export default new Vuex.Store({
         headers: { Authorization: `Bearer ${myToken}` },
         spinner: '.conflict-detail-spinner'
       }).then(response => {
-
+        $('.conflict-detail-spinner').addClass('hidden')
         commit('loadNamesConflictJSON', response.data)
-      })
-        .catch(error => this.dispatch('checkError', {
+      }).catch(error => {
+        $('.conflict-detail-spinner').addClass('hidden')
+        dispatch('checkError', {
           errors: [{
             code: 404,
             message: { 'NR Info Error': ['NR info could not be displayed because it isn\'t loaded in postgres yet.'] }
           }]
-        }))
+        })
+      })
     },
 
     getCorpConflict({ state, commit, dispatch }, value) {
@@ -1522,32 +1527,42 @@ export default new Vuex.Store({
       const vm = this
       return axios.get(url, {
         headers: { Authorization: `Bearer ${myToken}` },
-        spinner: '.conflict-detail-spinner'
+        spinner: false,
       }).then(response => {
         commit('loadCorpConflictJSON', response.data)
-      })
-        .catch(error => this.dispatch('checkError', {
+        $('.conflict-detail-spinner').addClass('hidden')
+      }).catch(error => {
+        $('.conflict-detail-spinner').addClass('hidden')
+        dispatch('checkError', {
           errors: [{
             code: 404,
-            message: { 'Corp Info Error': ['Corporation info could not be displayed because it isn\'t in fdw-registries data.'] }
+            message: { 'Corp Info Error':
+                ['Corporation info could not be displayed because it isn\'t in fdw-registries data.']
+            }
           }]
-        }))
+        })
+      })
     },
 
+
     getHistoryInfo({ state, commit, dispatch }, value) {
+      $('.history-list-spinner').removeClass('hidden')
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/' + value.nr_num
       const vm = this
-      return axios.get(url, { headers: { Authorization: `Bearer ${myToken}` }, spinner: '.history-list-spinner' }).then(response => {
+      return axios.get(url, { headers: { Authorization: `Bearer ${myToken}` }, spinner: false, }).then(response => {
         commit('loadHistoriesInfoJSON', response.data)
         $('.history-list-spinner').addClass('hidden')
       })
-        .catch(error => this.dispatch('checkError', {
-          errors: [{
-            code: 404,
-            message: { 'NR Info Error': ['NR info could not be displayed because it isn\'t loaded in postgres yet.'] }
-          }]
-        }))
+        .catch(error => {
+          $('.history-list-spinner').addClass('hidden')
+          dispatch('checkError', {
+            errors: [{
+              code: 404,
+              message: { 'NR Info Error': ['NR info could not be displayed because it isn\'t loaded in postgres yet.'] }
+            }]
+          })
+        })
     },
 
     getSearchDataJSON({ commit, state }, val) {
@@ -1583,28 +1598,27 @@ export default new Vuex.Store({
       commit('currentNameObj', objName)
     },
     runManualRecipe({ dispatch, state, commit }, searchObj) {
+      console.log('running manual recipe')
       if (state.currentChoice != null) {
         $('.conflict-container-spinner').removeClass('hidden')
         commit('setConflictsReturnedStatus', false)
-        let p1 = this.dispatch('checkManualExactMatches', searchObj.searchStr)
-        let p2 = this.dispatch('checkManualSynonymMatches', searchObj)
-        let p3 = this.dispatch('checkManualCobrsPhoneticMatches', searchObj)
-        let p4 = this.dispatch('checkManualPhoneticMatches', searchObj)
+        let p1 = dispatch('checkManualExactMatches', searchObj.searchStr)
+        let p2 = dispatch('checkManualSynonymMatches', searchObj)
+        let p3 = dispatch('checkManualCobrsPhoneticMatches', searchObj)
+        let p4 = dispatch('checkManualPhoneticMatches', searchObj)
         Promise.all([p1, p2, p3, p4]).then(() => {
-
+          console.log('promise.all')
           commit('setConflictsReturnedStatus', true)
           $('.conflict-container-spinner').addClass('hidden')
-          console.log('this should be last')
         })
         // this.dispatch('checkManualConflicts',searchStr)
-        this.dispatch('checkManualTrademarks', searchObj.searchStr)
-        this.dispatch('checkManualConditions', searchObj.searchStr)
-        this.dispatch('checkManualHistories', searchObj.searchStr)
+        dispatch('checkManualTrademarks', searchObj.searchStr)
+        dispatch('checkManualConditions', searchObj.searchStr)
+        dispatch('checkManualHistories', searchObj.searchStr)
       }
     },
-
+  
     checkManualExactMatches({ commit, state }, query) {
-      console.log('begin matches')
       query = query.replace(' \/', '\/')
         .replace(/(^|\s+)(\$+(\s|$)+)+/g, '$1DOLLAR$3')
         .replace(/(^|\s+)(¢+(\s|$)+)+/g, '$1CENT$3')
@@ -1619,16 +1633,12 @@ export default new Vuex.Store({
       query = query.substring(0, 1) == '+' ? query.substring(1) : query
       query = encodeURIComponent(query)
       const url = '/api/v1/exact-match?query=' + query
-      return new Promise((resolve, reject) => {
-        axios.get(url, {
-          headers: { Authorization: `Bearer ${myToken}` },
-          spinner: '.exact-match-spinner'
-        }).then(response => {
-          commit('setExactMatchesConflicts', response.data)
-          resolve()
-        }).catch(error => { console.log('ERROR (exact matches): ' + error)
-        reject() })
-      })
+      return axios.get(url, {
+        headers: { Authorization: `Bearer ${myToken}` },
+        spinner: '.exact-match-spinner'
+      }).then(response => {
+        commit('setExactMatchesConflicts', response.data)
+      }).catch(error => { console.log('ERROR (exact matches): ' + error) })
     },
     checkManualSynonymMatches({ dispatch, commit, state }, searchObj) {
       var searchStr = ((searchObj.searchStr == '') ? '*' : searchObj.searchStr)
@@ -1647,20 +1657,13 @@ export default new Vuex.Store({
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/synonymbucket/' + searchStr + '/' + exactPhrase
       dispatch('checkToken')
-      return new Promise((resolve, reject) => {
-        axios.get(url, {
-          headers: { Authorization: `Bearer ${myToken}` },
-          spinner: '.synonym-match-spinner'
-        }).then( response => {
-          console.log('This is first!')
-          commit('setSynonymMatchesConflicts', response.data)
-          console.log('this is 4th')
-          resolve()
-        }).catch( error => {
-          console.log('ERROR (synonym matches): ' + error)
-          reject()
-        })
-      })
+      return axios.get(url, {
+        headers: { Authorization: `Bearer ${myToken}` },
+        spinner: '.synonym-match-spinner'
+      }).then( response => {
+        commit('setSynonymMatchesConflicts', response.data)
+      }).catch( error => {
+        console.log('ERROR (synonym matches): ' + error) })
     },
     checkManualCobrsPhoneticMatches({ dispatch, commit, state }, searchObj) {
       var query = ((searchObj.searchStr == '') ? '*' : searchObj.searchStr)
@@ -1677,18 +1680,13 @@ export default new Vuex.Store({
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/cobrsphonetics/' + query + '/*'
       dispatch('checkToken')
-      return new Promise((resolve, reject) => {
-        return axios.get(url, {
-          headers: { Authorization: `Bearer ${myToken}` },
-          spinner: '.cobrs-phonetic-match-spinner'
-        }).then( response => {
-          commit('setCobrsPhoneticConflicts', response.data)
-          resolve()
-        }).catch( error => {
-          console.log('ERROR (CobrsPhonetic matches): ' + error)
-          reject()
-        })
-      })
+      return axios.get(url, {
+        headers: { Authorization: `Bearer ${myToken}` },
+        spinner: '.cobrs-phonetic-match-spinner'
+      }).then( response => {
+        commit('setCobrsPhoneticConflicts', response.data)
+      }).catch( error => {
+        console.log('ERROR (CobrsPhonetic matches): ' + error) })
     },
     checkManualPhoneticMatches({ dispatch, commit, state }, searchObj) {
       let query = ((searchObj.searchStr == '') ? '*' : searchObj.searchStr)
@@ -1705,18 +1703,14 @@ export default new Vuex.Store({
       const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
       const url = '/api/v1/requests/phonetics/' + query + '/*'
       dispatch('checkToken')
-      return new Promise((resolve, reject) => {
-        axios.get(url, {
-          headers: { Authorization: `Bearer ${myToken}` },
-          spinner: '.phonetic-match-spinner'
-        }).then( response => {
-          commit('setPhoneticConflicts', response.data)
-          resolve()
-        }).catch(error => {
-          console.log('ERROR (Phonetic matches): ' + error)
-          reject()
-        })
+      return axios.get(url, {
+        headers: { Authorization: `Bearer ${myToken}` }, spinner: '.phonetic-match-spinner'
       })
+        .then(response => {
+          commit('setPhoneticConflicts', response.data)
+        })
+        .catch(error => {
+          console.log('ERROR (Phonetic matches): ' + error) })
     },
     checkManualConditions({ commit, state }, searchStr) {
       if (searchStr != '') {
@@ -1813,6 +1807,9 @@ export default new Vuex.Store({
       commit('currentHistory', null)
       commit('currentTrademark', null)
       commit('loadTrademarksJSON', null)
+      commit('setSelectedConflicts', [])
+      commit('setSelectedConditions', [])
+      commit('setSelectedTrademarks', [])
       // reset all flags like editing, making decision, etc.
       state.is_editing = false
       state.is_making_decision = false
@@ -2250,5 +2247,6 @@ export default new Vuex.Store({
       }
       return []
     },
+    conflictsListenerState: state => state.conflictsListenerState,
   }
 })

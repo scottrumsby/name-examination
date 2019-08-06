@@ -1,9 +1,11 @@
 <template>
-  <v-container fluid ma-0 pa-0>
+  <v-container fluid ma-0 pa-0 >
     <v-layout :conflict-highlighted="childIndex === n && focus === 'conflicts'"
               :id="child.id"
-              align-center
               wrap
+              ma-0
+              align-center
+              pb-0
               pl-3>
       <v-flex shrink v-if="child.nrNumber">
         <v-checkbox style="position: relative; top:4px"
@@ -74,6 +76,7 @@
   .conflict-detail-spinner:not(.hidden) ~ .conflict-detail {
     display: none !important;
   }
+
   .no-overflow {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -82,15 +85,6 @@
 
   .cursor-pointer, .title-match, .bucket-list {
     cursor: pointer !important;
-  }
-
-  .conflict-cobrs-phonetic-title {
-    padding: 5px;
-    margin: 0 !important;
-    text-transform: uppercase;
-    color: var(--text);
-    font-weight: 400;
-    height: 32px !important;
   }
 
   .conflict-exact-match {
@@ -104,20 +98,6 @@
     font-style: italic !important;
   }
 
-  .conflict-no-match {
-    color: var(--l-grey);
-    height: 32px !important;
-  }
-
-  .conflict-phonetic-title {
-    padding: 5px;
-    margin: 0;
-    text-transform: uppercase;
-    color: var(--text);
-    font-weight: 400;
-    height: 32px !important;
-  }
-
   .conflict-result {
     color: #38598a;
     height: 32px !important;
@@ -125,23 +105,6 @@
 
   .conflict-highlighted {
     background-color: #dceffa;
-  }
-
-  .conflict-synonym-title {
-    padding: 5px;
-    margin-top: 0;
-    height: 32px !important;
-    text-transform: uppercase;
-    color: var(--text);
-    font-weight: 400;
-  }
-
-  .conflict-heading {
-    background-color: var(--l-grey);
-    font-weight: 600;
-    padding: 5px 8px 5px 8px;
-    color: var(--text);
-    margin-bottom: 1px;
   }
 
   .shift-up {

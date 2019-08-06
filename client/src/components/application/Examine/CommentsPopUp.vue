@@ -27,6 +27,8 @@
         <v-layout column>
           <v-flex>
             <v-textarea class="comments-text-area"
+                        @focus="$store.commit('setConflictsListenerState', 'disabled')"
+                        @blur="$store.commit('setConflictsListenerState', 'listenAll')"
                         no-resize
                         v-model="newComment" />
           </v-flex>

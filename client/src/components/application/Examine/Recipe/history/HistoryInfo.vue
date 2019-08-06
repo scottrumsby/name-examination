@@ -1,7 +1,7 @@
 <!--eslint-disable-->
 <template>
   <v-container pt-0 pb-3 px-3 fluid align-start bg-color id="history-container">
-    <spinner className="history-list-spinner hidden" />
+    <spinner className="history-list-spinner" />
     <v-layout align-items-start class="history-list-layout">
       <v-layout wrap style="width: 45%" align-items-start>
         <v-flex item-heading>Client</v-flex>

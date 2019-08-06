@@ -1,4 +1,3 @@
-<!--eslint-disable-->
 <template>
   <v-flex>
     <!--1st ROW - NR NUMBER / JURISDICTION / BUTTONS -->
@@ -132,7 +131,7 @@
                     <v-flex class="error c-priority" v-if="!$v.expiryDateForEdit.isValidFormat" >
                       Date must be in format YYYY-MM-DD.
                     </v-flex >
-                    <v-flex class="error c-priority" v-if="!$v.expiryDateForEdit.isFutureDate">
+                    <v-flex class="c-priority" v-if="!$v.expiryDateForEdit.isFutureDate">
                       Expiry Date must be in the future.
                     </v-flex>
                   </v-layout>

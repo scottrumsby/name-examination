@@ -29,16 +29,16 @@ describe('store > setSynonymMatchesConflicts', () => {
     })
 
     it('identifies titles and collape the two last', () => {
-      expect(data[0].class).toEqual('conflict-synonym-title collapsible expanded')
-      expect(data[2].class).toEqual('conflict-synonym-title collapsible collapsed')
-      expect(data[5].class).toEqual('conflict-synonym-title collapsible collapsed')
+      expect(data[0].class).toEqual('conflict-synonym-title')
+      expect(data[2].class).toEqual('conflict-synonym-title')
+      expect(data[5].class).toEqual('conflict-synonym-title')
     })
     it('identifies matches and hides the last two sets', () => {
-      expect(data[1].class).toEqual('conflict-result conflict-result-displayed')
-      expect(data[3].class).toEqual('conflict-result conflict-result-hidden')
-      expect(data[4].class).toEqual('conflict-result conflict-result-hidden')
-      expect(data[6].class).toEqual('conflict-result conflict-result-hidden')
-      expect(data[7].class).toEqual('conflict-result conflict-result-hidden')
+      expect(data[1].class).toEqual('conflict-result')
+      expect(data[3].class).toEqual('conflict-result')
+      expect(data[4].class).toEqual('conflict-result')
+      expect(data[6].class).toEqual('conflict-result')
+      expect(data[7].class).toEqual('conflict-result')
     })
     it('includes count', () => {
       expect(data[2].count).toEqual(2)

@@ -94,55 +94,86 @@ describe('Synonym-Match Conflicts', () => {
     })
 
     it('displays synonym-match conflicts', () => {
-      expect(data.vm.$el.querySelector('#conflict-list').textContent).toContain('INCREDIBLE STEPS RECORDS, INC.')
-
-      // expect not to see spinner and results at the same time
-      expect(data.vm.$el.querySelector('#conflict-list .synonym-match-spinner').classList.contains('hidden'));
+      data.vm.$store.state.conflictsReturnedStatus = true
+      data.vm.$nextTick(function(){
+        expect(data.vm.$el.querySelector('#conflicts-container').innerHTML)
+          .toContain('INCREDIBLE' + ' STEPS RECORDS, INC.')
+  
+        // expect not to see spinner and results at the same time
+        expect(data.vm.$el.querySelector('#conflicts-container .conflict-container-spinner')
+          .classList
+          .contains('hidden'));
+      })
     })
 
     it('displays synonym-match conflicts after exact match list', () => {
-      var content = data.vm.$el.querySelector('#conflict-list').textContent.trim()
-      expect(content.indexOf('fake exact match')).not.toEqual(-1)
-      expect(content.indexOf('Synonym Match')).not.toEqual(-1)
-      expect(content.indexOf('fake exact match') < content.indexOf('Synonym Match')).toEqual(true)
+      data.vm.$store.state.conflictsReturnedStatus = true
+      data.vm.$nextTick(function () {
+        var content = data.vm.$el.querySelector('#conflicts-container').textContent.trim()
+        expect(content.indexOf('fake exact match')).not.toEqual(-1)
+        expect(content.indexOf('Synonym Match')).not.toEqual(-1)
+        expect(content.indexOf('fake exact match') < content.indexOf('Synonym Match')).toEqual(true)
+      })
     })
 
     it('populates additional attributes as expected', () => {
-      expect(data.instance.$store.state.synonymMatchesConflicts).toEqual([
-        {
+      expect(data.instance.$store.state.synonymMatchesConflicts).toEqual([{
+          "children": [],
           "class": "conflict-synonym-title",
           "count": 0,
           "highlightedText": "INCREDIBLE NAME BLA*",
+          "id": "0-synonym",
+          "jurisdiction": undefined,
           "meta": "meta1",
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE NAME BLA*"
-        },
-        {
+        }, {
+          "children": [],
           "class": "conflict-synonym-title",
           "count": 0,
           "highlightedText": "INCREDIBLE NAME*",
+          "id": "1-synonym",
+          "jurisdiction": undefined,
           "meta": "meta2",
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE NAME*"
-        },
-        {
-          "class": "conflict-synonym-title collapsible collapsed",
+        }, {
+          "children": [{
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "INCREDIBLE STEPS RECORDS, INC.",
+            "id": "3-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0793638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "INCREDIBLE STEPS RECORDS, INC."
+          }],
+          "class": "conflict-synonym-title",
           "count": 1,
           "highlightedText": "INCREDIBLE*",
+          "id": "2-synonym",
+          "jurisdiction": undefined,
           "meta": "meta3",
           "nrNumber": undefined,
           "source": undefined,
+          "startDate": undefined,
           "text": "INCREDIBLE*"
-        },
-        {
-          "class": "conflict-result conflict-result-hidden",
+        }, {
+          "class": "conflict-result",
           "count": 0,
           "highlightedText": "INCREDIBLE STEPS RECORDS, INC.",
+          "id": "3-synonym",
+          "jurisdiction": undefined,
           "meta": undefined,
           "nrNumber": "0793638",
           "source": "CORP",
+          "startDate": undefined,
           "text": "INCREDIBLE STEPS RECORDS, INC."
         }]
       )
@@ -214,79 +245,153 @@ describe('Synonym-Match Conflicts', () => {
         sessionStorage.setItem('AUTHORIZED', true)
         router.push('/nameExamination')
         setTimeout(() => {
-          expect(data.instance.$store.state.synonymMatchesConflicts).toEqual([
-            {
-              "class": "conflict-synonym-title collapsible expanded",
-              "count": 3,
-              "highlightedText": "<span class=\"stem-highlight\"> PACIF</span>IC<span class=\"stem-highlight\"> LUMB</span>ER<span class=\"stem-highlight\"> CONSTRUCT</span>ION",
-              "meta": "meta1",
-              "nrNumber": undefined,
-              "source": undefined,
-              "text": "PACIFIC LUMBER CONSTRUCTION"
-            },
-            {
-              "class": "conflict-result conflict-result-displayed",
+          expect(data.instance.$store.state.synonymMatchesConflicts).toEqual([{
+            "children": [{
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER<span class=\"synonym-stem-highlight\"> DEVELOP</span>MENTS",
+              "id": "1-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0193638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LUMBER DEVELOPMENTS"
-            },
-            {
-              "class": "conflict-result conflict-result-displayed",
+            }, {
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> CONSTRUCT</span></span>ION",
+              "id": "2-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0293638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LOG CONSTRUCTION"
-            },
-            {
-              "class": "conflict-result conflict-result-displayed",
+            }, {
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+              "id": "3-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0393638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LOG RENOVATIONS"
-            },
-            {
-              "class": "conflict-synonym-title collapsible collapsed",
-              "count": 1,
-              "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"> LUMB</span>ER (CONSTRUCTION)",
-              "meta": "meta2",
-              "nrNumber": undefined,
-              "source": undefined,
-              "text": "PACIFIC LUMBER (CONSTRUCTION)"
-            },
-            {
-              "class": "conflict-result conflict-result-hidden",
+            }],
+            "class": "conflict-synonym-title",
+            "count": 3,
+            "highlightedText": "<span class=\"stem-highlight\"> PACIF</span>IC<span class=\"stem-highlight\"> LUMB</span>ER<span class=\"stem-highlight\"> CONSTRUCT</span>ION",
+            "id": "0-synonym",
+            "jurisdiction": undefined,
+            "meta": "meta1",
+            "nrNumber": undefined,
+            "source": undefined,
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER CONSTRUCTION"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER<span class=\"synonym-stem-highlight\"> DEVELOP</span>MENTS",
+            "id": "1-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0193638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER DEVELOPMENTS"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> CONSTRUCT</span></span>ION",
+            "id": "2-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0293638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LOG CONSTRUCTION"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+            "id": "3-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0393638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LOG RENOVATIONS"
+          }, {
+            "children": [{
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+              "id": "5-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0493638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LUMBER WORD1 WORD2 WORD3 WORD4 RENOVATIONS"
-            },
-            {
-              "class": "conflict-synonym-title collapsible collapsed",
-              "count": 1,
-              "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC (LUMBER, CONSTRUCTION)",
-              "meta": "meta3",
-              "nrNumber": undefined,
-              "source": undefined,
-              "text": "PACIFIC (LUMBER, CONSTRUCTION)"
-            },
-            {
-              "class": "conflict-result conflict-result-hidden",
+            }],
+            "class": "conflict-synonym-title",
+            "count": 1,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"> LUMB</span>ER (CONSTRUCTION)",
+            "id": "4-synonym",
+            "jurisdiction": undefined,
+            "meta": "meta2",
+            "nrNumber": undefined,
+            "source": undefined,
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER (CONSTRUCTION)"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+            "id": "5-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0493638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER WORD1 WORD2 WORD3 WORD4 RENOVATIONS"
+          }, {
+            "children": [{
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> LUMB</span>ER<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+              "id": "7-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0593638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC WORD1 WORD2 WORD3 WORD4 LUMBER RENOVATIONS"
-            }
+            }],
+            "class": "conflict-synonym-title",
+            "count": 1,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC (LUMBER, CONSTRUCTION)",
+            "id": "6-synonym",
+            "jurisdiction": undefined,
+            "meta": "meta3",
+            "nrNumber": undefined,
+            "source": undefined,
+            "startDate": undefined,
+            "text": "PACIFIC (LUMBER, CONSTRUCTION)"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> LUMB</span>ER<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+            "id": "7-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0593638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC WORD1 WORD2 WORD3 WORD4 LUMBER RENOVATIONS"
+          }
           ])
           done();
         }, 1000)
@@ -359,79 +464,153 @@ describe('Synonym-Match Conflicts', () => {
         sessionStorage.setItem('AUTHORIZED', true)
         router.push('/nameExamination')
         setTimeout(() => {
-          expect(data.instance.$store.state.synonymMatchesConflicts).toEqual([
-            {
-              "class": "conflict-synonym-title collapsible expanded",
-              "count": 3,
-              "highlightedText": "<span class=\"stem-highlight\"> PACIF</span>IC<span class=\"stem-highlight\"> LUMB</span>ER<span class=\"stem-highlight\"> CONSTRUCT</span>ION",
-              "meta": "meta1",
-              "nrNumber": undefined,
-              "source": undefined,
-              "text": "PACIFIC LUMBER CONSTRUCTION"
-            },
-            {
-              "class": "conflict-result conflict-result-displayed",
+          expect(data.instance.$store.state.synonymMatchesConflicts).toEqual([{
+            "children": [{
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER<span class=\"synonym-stem-highlight\"> DEVELOP</span>MENTS",
+              "id": "1-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0193638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LUMBER DEVELOPMENTS"
-            },
-            {
-              "class": "conflict-result conflict-result-displayed",
+            }, {
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> CONSTRUCT</span></span>ION",
+              "id": "2-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0293638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LOG CONSTRUCTION"
-            },
-            {
-              "class": "conflict-result conflict-result-displayed",
+            }, {
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+              "id": "3-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0393638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LOG RENOVATIONS"
-            },
-            {
-              "class": "conflict-synonym-title collapsible collapsed",
-              "count": 1,
-              "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"> LUMB</span>ER (CONSTRUCTION)",
-              "meta": "meta2",
-              "nrNumber": undefined,
-              "source": undefined,
-              "text": "PACIFIC LUMBER (CONSTRUCTION)"
-            },
-            {
-              "class": "conflict-result conflict-result-hidden",
+            }],
+            "class": "conflict-synonym-title",
+            "count": 3,
+            "highlightedText": "<span class=\"stem-highlight\"> PACIF</span>IC<span class=\"stem-highlight\"> LUMB</span>ER<span class=\"stem-highlight\"> CONSTRUCT</span>ION",
+            "id": "0-synonym",
+            "jurisdiction": undefined,
+            "meta": "meta1",
+            "nrNumber": undefined,
+            "source": undefined,
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER CONSTRUCTION"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER<span class=\"synonym-stem-highlight\"> DEVELOP</span>MENTS",
+            "id": "1-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0193638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER DEVELOPMENTS"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> CONSTRUCT</span></span>ION",
+            "id": "2-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0293638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LOG CONSTRUCTION"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"synonym-stem-highlight\"> LOG</span><span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+            "id": "3-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0393638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LOG RENOVATIONS"
+          }, {
+            "children": [{
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+              "id": "5-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0493638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC LUMBER WORD1 WORD2 WORD3 WORD4 RENOVATIONS"
-            },
-            {
-              "class": "conflict-synonym-title collapsible collapsed",
-              "count": 1,
-              "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC (LUMBER, CONSTRUCTION)",
-              "meta": "meta3",
-              "nrNumber": undefined,
-              "source": undefined,
-              "text": "PACIFIC (LUMBER, CONSTRUCTION)"
-            },
-            {
-              "class": "conflict-result conflict-result-hidden",
+            }],
+            "class": "conflict-synonym-title",
+            "count": 1,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"> LUMB</span>ER (CONSTRUCTION)",
+            "id": "4-synonym",
+            "jurisdiction": undefined,
+            "meta": "meta2",
+            "nrNumber": undefined,
+            "source": undefined,
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER (CONSTRUCTION)"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> LUMB</span></span>ER WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+            "id": "5-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0493638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC LUMBER WORD1 WORD2 WORD3 WORD4 RENOVATIONS"
+          }, {
+            "children": [{
+              "class": "conflict-result",
               "count": 0,
               "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> LUMB</span>ER<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+              "id": "7-synonym",
+              "jurisdiction": undefined,
               "meta": undefined,
               "nrNumber": "0593638",
               "source": "CORP",
+              "startDate": undefined,
               "text": "PACIFIC WORD1 WORD2 WORD3 WORD4 LUMBER RENOVATIONS"
-            }
+            }],
+            "class": "conflict-synonym-title",
+            "count": 1,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC (LUMBER, CONSTRUCTION)",
+            "id": "6-synonym",
+            "jurisdiction": undefined,
+            "meta": "meta3",
+            "nrNumber": undefined,
+            "source": undefined,
+            "startDate": undefined,
+            "text": "PACIFIC (LUMBER, CONSTRUCTION)"
+          }, {
+            "class": "conflict-result",
+            "count": 0,
+            "highlightedText": "<span class=\"stem-highlight\"><span class=\"synonym-stem-highlight\"> PACIF</span></span>IC WORD1 WORD2 WORD3 WORD4<span class=\"synonym-stem-highlight\"> LUMB</span>ER<span class=\"synonym-stem-highlight\"> RENO</span>VATIONS",
+            "id": "7-synonym",
+            "jurisdiction": undefined,
+            "meta": undefined,
+            "nrNumber": "0593638",
+            "source": "CORP",
+            "startDate": undefined,
+            "text": "PACIFIC WORD1 WORD2 WORD3 WORD4 LUMBER RENOVATIONS"
+          }
           ])
           done();
         }, 1000)

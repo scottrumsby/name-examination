@@ -42,6 +42,8 @@
                   <v-textarea class="addtnl-info-text-area"
                               style="white-space"
                               id="info-header-card-add-info"
+                              @focus="$store.commit('setConflictsListenerState', 'disabled')"
+                              @blur="$store.commit('setConflictsListenerState', 'listenAll')"
                               no-resize
                               rows="15"
                               v-model="additionalInfo" />

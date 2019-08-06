@@ -46,6 +46,8 @@
                 <div>
                   <v-text-field class="styled-input"
                                 autocomplete="off"
+                                @focus="$store.commit('setConflictsListenerState', 'disabled')"
+                                @blur="$store.commit('setConflictsListenerState', 'listenAll')"
                                 type="search"
                                 placeholder="NR Number Lookup"
                                 v-model="nrNum"

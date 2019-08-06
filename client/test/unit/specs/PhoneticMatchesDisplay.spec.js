@@ -28,15 +28,8 @@ describe('ConflictList.vue phonetic matches expand/collapse', () => {
 
   it('is available', () => {
 
-    expect(data[2].class).toEqual('conflict-phonetic-title collapsible collapsed')
-    expect(data[3].class).toEqual('conflict-result conflict-result-hidden')
-    expect(data[4].class).toEqual('conflict-result conflict-result-hidden')
-  })
-  it('toggles as expected', () => {
-    vm.expand_collapse({text: 'second title'}, 'phonetic')
-
-    expect(data[2].class).toEqual('conflict-phonetic-title collapsible expanded')
-    expect(data[3].class).toEqual('conflict-result conflict-result-displayed')
-    expect(data[4].class).toEqual('conflict-result conflict-result-displayed')
+    expect(data[2].class).toEqual('conflict-phonetic-title')
+    expect(data[3].class).toEqual('conflict-result')
+    expect(data[4].class).toEqual('conflict-result')
   })
 })

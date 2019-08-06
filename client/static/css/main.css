@@ -80,6 +80,10 @@ body {
   color: var(--grey) !important;
 }
 
+.c-gold {
+  color: var(--gold) !important;
+}
+
 .c-link {
   color: var(--link) !important;
 }
@@ -205,6 +209,9 @@ body {
   background-color: var(--xl-grey) !important;
 }
 
+#find-filter .v-list__tile__title {
+  font-size: 13px !important;
+}
 
 /* overrides of vuetify styles */
 .application {
@@ -271,11 +278,27 @@ body {
   font-weight: 400 !important;
 }
 
-.v-table__overflow {
+not(#find-filter, #stats-viewer) .v-table__overflow {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   height: 450px !important;
   max-height: 450px !important;
+}
+
+/*min height to allow v-select's in table header not to get cut off when few
+ items returned in search */
+#find-filter .v-table__overflow {
+  min-height: 400px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  max-height: 700px;
+}
+
+#stats-viewer .v-table__overflow {
+  min-height: 400px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  max-height: 700px;
 }
 
 .v-input__slot:after, .v-input__slot:before {

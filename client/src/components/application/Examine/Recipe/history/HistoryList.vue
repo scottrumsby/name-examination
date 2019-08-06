@@ -6,7 +6,6 @@
       <v-flex v-if="historiesJSON.length > 0">
         <v-data-table :headers="headers"
                       :items="historiesJSON"
-                      class="conditions-table-style"
                       v-shortkey="{arrowup:['arrowup'],arrowdown:['arrowdown'],arrowright:['arrowright'],arrowleft:['arrowleft']}"
                       @shortkey.native="handleKeyboardEvent"
                       hide-actions>
@@ -51,7 +50,7 @@ import moment from 'moment'
           { text: 'Name', value: 'name', align: 'left', sortable: false, },
           { text: 'Jurisdiction', value: 'jurisdiction', align: 'left', sortable: false, },
           { text: 'NR', value: 'nr_num', align: 'left', sortable: false, },
-          { text: 'Consumed', value: 'startDate', align: 'left', sortable: false, },
+          { text: 'Submitted', value: 'startDate', align: 'left', sortable: false, },
           { text: 'Status', value: 'none', align: 'left', sortable: false, },
         ],
         expandedInd: null,
@@ -107,13 +106,15 @@ import moment from 'moment'
         if ( item.name_state_type_cd === 'R' ) return { color: 'var(--rejected)'   }
       },
       setHistoryInfo(item, index) {
-        if (this.currentNrNum && item.nr_num == this.currentNrNum) {
+        if (this.expandedInd === index) {
+          this.expandedInd = null
           this.currentHistory = ''
           this.ind = index
           this.$store.dispatch('resetHistoriesInfo')
           return
         }
         this.currentHistory = item
+        this.expandedInd = index
         this.ind = index
         this.$store.dispatch('resetHistoriesInfo')
         this.$store.dispatch('getHistoryInfo', item)
@@ -187,6 +188,10 @@ import moment from 'moment'
 
   .history-list-view option {
     padding: 5px;
+  }
+
+  tr:hover {
+    background-color: unset !important;
   }
 
   tr {

@@ -8,7 +8,11 @@
       <v-layout :class="title.class"
                 :conflict-highlighted="index === i && focus === 'conflicts' "
                 :id="title.id"
+                :pt-1="expandedID === title.id ? true: false"
                 exact-match-layout
+                align-center
+                pl-3
+                pr-5
                 v-if="title.nrNumber">
         <v-flex shrink>
           <v-checkbox :disabled="!is_making_decision"
@@ -17,7 +21,7 @@
                       @click.capture.stop.self="setCheckbox(title)"
                       class="shift-up"/>
         </v-flex>
-        <v-flex @click="clickExactMatch(title, index)"
+        <v-flex @click="clickExactMatch(title, i)"
                 cursor-pointer
                 grow
                 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
@@ -36,13 +40,16 @@
                 text-right
                 v-if="title.startDate">{{ formatDate(title.startDate) }}
         </v-flex>
+        <v-layout v-if="expandedID === title.id">
+          <ConflictInfo class="conflict-detail"/>
+        </v-layout>
       </v-layout>
 
       <!--CASE:  TITLES WITH CHILDREN / COUNT OF 1 OR MORE / EXPAND COLLAPSE ICONS-->
       <v-layout :class="title.class"
-                :conflict-highlighted="index === i && focus === 'conflicts' "
+                :conflict-highlighted="index === i && focus === 'conflicts' ? true : false"
                 :id="title.id"
-                @click="clickBucket(title, i)"
+                @click="clickBucket(i)"
                 title-layout
                 v-else-if="title.count > 0">
         <v-flex cursor-pointer grow>
@@ -75,7 +82,8 @@
       <v-flex class="bucket-list"
               id="bucket-list"
               v-if="children && openBucketIndex === i">
-          <virtual-list :remain="14"
+          <virtual-list :remain="remain"
+                        :bench="100-remain"
                         :scrollelement="containerDivEl"
                         :size="32">
             <ConflictListItem :child="child"
@@ -117,42 +125,38 @@
         children: [],
         cobrs: '',
         other: '',
+        k: 1,
         listener: null,
-        focus: null,
-        listenerBlocked: false,
+        focus: 'conflicts',
       }
     },
     mounted() {
       this.addListener()
-      this.$root.$on('addconflictlistener', () => {
-        this.addListener()
-      })
-      this.$root.$on('removeconflictlistener', () => {
-        this.removeListener()
-      })
       this.$root.$on('setconflictfocus', (area) => {
-        this.focus = area
+        this.setFocus(area)
       })
-      if (this.$store.state.conflictsReturnedStatus) {
+      this.$root.$on('initializeconflicts', () => {
+        this.initialize()
         this.setInitialFocus()
-      }
+      })
     },
     beforeDestroy() {
       this.removeListener()
     },
     computed: {
-      ...mapGetters([
-        'cobrsPhoneticConflicts',
-        'exactMatchesConflicts',
-        'is_making_decision',
-        'phoneticConflicts',
-        'selectedConflictID',
-        'expandedConflictID',
-        'selectedConflicts',
-        'openBucket',
-        'synonymMatchesConflicts',
-        'conflictTitles',
-      ]),
+      ...mapGetters({
+        cobrsPhoneticConflicts: 'cobrsPhoneticConflicts',
+        exactMatchesConflicts: 'exactMatchesConflicts',
+        is_making_decision: 'is_making_decision',
+        phoneticConflicts: 'phoneticConflicts',
+        conflicts: 'selectedConflicts',
+        selectedConflictID: 'selectedConflictID',
+        expandedConflictID: 'expandedConflictID',
+        openBucket: 'openBucket',
+        synonymMatchesConflicts: 'synonymMatchesConflicts',
+        conflictTitles: 'conflictTitles',
+        conflictsListenerState: 'conflictsListenerState',
+      }),
       containerDivEl() {
         let el = document.getElementById('conflicts-container')
         if (el) return el
@@ -166,6 +170,7 @@
         }
       },
       lastIndex() {
+        //finds the index of the last clickable conflictTitle
         if (this.conflictTitles && this.conflictTitles.length > 0) {
           for (let i = this.conflictTitles.length - 1; i >= 0; i--) {
             if (this.conflictTitles[i].count > 0) return i
@@ -176,8 +181,21 @@
       openBucketIndex: {
         get() {
           return this.openBucket
+        }, set(index) {
+          this.$store.commit('setOpenBucket', index)
+        }
+      },
+      remain() {
+        if (this.children) {
+          return this.children.length < 14 ? this.children.length : 14
+        }
+        return null
+      },
+      selectedConflicts: {
+        get() {
+          return this.conflicts
         }, set(item) {
-          this.$store.commit('setOpenBucket', item)
+          this.$store.commit('setSelectedConflicts', item)
         }
       },
       selectedNRs() {
@@ -188,16 +206,27 @@
     },
     watch: {
       conflictTitles(newData) {
+        this.initialize()
         this.setInitialFocus(newData)
       },
     },
     methods: {
+      initialize() {
+        this.index = null
+        this.childIndex = 0
+        this.children = null
+        this.openBucketIndex = null
+        this.expandedID = null
+        this.selectedConflicts = []
+        this.focus = 'conflicts'
+      },
       addListener() {
         if (!this.listener) {
-          this.listener = document.addEventListener('keydown', this.handleKeyboardEvent)
+          this.listener = document.addEventListener('keydown', this.manageEventListener)
         }
       },
-      clickBucket(match, index) {
+      clickBucket(index) {
+        this.focus = 'conflicts'
         this.expandedID = null
         if (this.openBucketIndex && index === this.openBucketIndex) {
           this.children = null
@@ -212,36 +241,48 @@
         this.openBucketIndex = index
       },
       clickChild(match, index) {
+        this.focus = 'conflicts'
         this.$store.dispatch('getConflictInfo', match)
         this.expandedID = null
         this.childIndex = index
         this.expandedID = match.id
       },
       clickExactMatch(match, index) {
+        this.focus = 'conflicts'
         this.$store.dispatch('getConflictInfo', match)
         this.openBucketIndex = null
         this.childIndex = 0
+        this.children = null
         this.index = index
         this.expandedID = match.id
       },
       formatDate(d) {
         return moment(d).format('YYYY-MM-DD')
       },
-      handleKeyboardEvent(event) {
+      manageEventListener(event) {
+        if (this.conflictsListenerState == 'disabled') {
+          return event
+        }
         let list
-        if (this.focus !== 'conflicts') {
-          list = ['Tab']
-        } else {
+        if (this.conflictsListenerState === 'listenAll') {
           list = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Tab']
+        } else if (this.conflictsListenerState === 'tabOnly') {
+          list = ['Tab']
         }
         if (list.includes(event.code)) {
           event.preventDefault()
-          switch (event.code) {
+          this.handleKeyboardEvent(event)
+        } else {
+          return event
+        }
+      },
+      handleKeyboardEvent(event) {
+      switch (event.code) {
 
             case 'ArrowDown':
               const moveDown = () => {
                 for (let i = this.index + 1; i < this.conflictTitles.length; i++) {
-                  if (this.conflictTitles[i].count > 0 || this.conflictTitles.nrNumber) {
+                  if (this.conflictTitles[i].count > 0 || this.conflictTitles[i].nrNumber) {
                     this.index = i
                     let { id } = this.conflictTitles[i]
                     this.scrollIntoView(id)
@@ -258,14 +299,16 @@
                   this.scrollIntoView(id)
                   return
                 }
-                if (this.childIndex >= this.children.length - 1) {
+                if (this.children && this.childIndex === this.children.length - 1) {
                   if (this.openBucketIndex === this.lastIndex) return
                   this.index = this.openBucketIndex
                   this.openBucketIndex = null
                   this.children = null
                   this.childIndex = 0
                   moveDown()
+                  return
                 }
+                moveDown()
                 return
               }
               moveDown()
@@ -320,17 +363,22 @@
               if (this.index && this.conflictTitles[this.index].nrNumber) {
                 let item = this.conflictTitles[this.index]
                 this.$store.dispatch('getConflictInfo', item)
-                this.expandedID = item.nrNumber
+                this.expandedID = item.id
                 this.scrollIntoView(item.id)
                 return
               }
               this.openBucketIndex = this.index
-              this.children = this.conflictTitles[this.index].children
+              let item = this.conflictTitles[this.index]
+              this.children = item.children
               this.index = null
               this.childIndex = 0
+              this.scrollIntoView(item.children[0].id)
               return
 
             case 'Space':
+              if (!this.is_making_decision) {
+                return
+              }
               //if child menu is open, then children[childIndex] must be conflict-result
               if (this.children) {
                 this.setCheckbox(this.children[this.childIndex])
@@ -349,27 +397,28 @@
               this.setFocus()
               return
           }
-        } else {
-          return event
-        }
       },
       removeListener() {
         document.removeEventListener('keydown', this.handleKeyboardEvent)
         this.listener = null
       },
       scrollIntoView(id) {
-        console.log('is it this?')
         this.$nextTick(function() {document.getElementById(id).scrollIntoViewIfNeeded() })
       },
-      setCheckbox(option) {
-        let conflictsCopy = [...this.selectedConflicts]
-        let index = this.selectedConflicts.findIndex(conflict => conflict.nrNumber === option.nrNumber)
-        if (index === -1) {
-          conflictsCopy.push(option)
-        } else {
-          conflictsCopy.splice(index, 1)
+      setCheckbox(options) {
+        if (options && !Array.isArray(options)) {
+          options = [options]
         }
-        this.$store.commit('setSelectedConflicts', conflictsCopy)
+        let conflictsCopy = [...this.selectedConflicts]
+        for (let option of options) {
+          let index = this.selectedConflicts.findIndex(conflict => conflict.nrNumber === option.nrNumber)
+          if (index === -1) {
+            conflictsCopy.push(option)
+          } else {
+            conflictsCopy.splice(index, 1)
+          }
+        }
+        this.selectedConflicts = conflictsCopy
       },
       setFocus(area) {
         if (!area) {
@@ -378,30 +427,34 @@
           if (this.focus === 'exact') area = 'conflicts'
         }
         if (area === 'regular') {
-          this.$root.$emit('setcompnamefocus', 'regularsearchfield')
+          this.$store.commit('setConflictsListenerState', 'tabOnly')
+          this.$root.$emit('setcompnamefocus', {ref: 'regularsearchfield'})
           this.focus = 'regular'
           return
         }
         if (area === 'exact') {
-          this.$root.$emit('setcompnamefocus', 'exactsearchfield')
+          this.$store.commit('setConflictsListenerState', 'tabOnly')
+          this.$root.$emit('setcompnamefocus', {ref: 'exactsearchfield'})
           this.focus = 'exact'
           return
         }
         if (area === 'conflicts') {
-          this.$root.$emit('setcompnamefocus', 'blur')
+          this.$store.commit('setConflictsListenerState', 'listenAll')
+          this.$root.$emit('setcompnamefocus', {ref:'exactsearchfield', type: 'blur'})
           this.focus = 'conflicts'
           return
         }
       },
-      setInitialFocus(newData=this.conflictTitles) {
+      setInitialFocus(newData) {
+        if (!newData) newData = this.conflictTitles
         for (let i = 0; i < newData.length; i++) {
           if (newData[i].nrNumber) {
             this.children = null
             this.index = i
             this.focus = 'conflicts'
+            this.$root.$emit('setcompnamefocus', { ref: 'regularsearchfield', type: 'blur' })
             this.openBucketIndex = null
-            this.setExactMatchesOnLoad()
-            this.$root.$emit('setcompnamefocus', 'blur')
+            this.setExactMatchesOnLoad(newData)
             this.scrollIntoView(newData[i].id)
             return
           }
@@ -410,28 +463,26 @@
             this.children = newData[i].children
             this.openBucketIndex = i
             this.focus = 'conflicts'
+            this.$root.$emit('setcompnamefocus', {ref: 'regularsearchfield', type: 'blur'})
             this.index = null
-            this.$root.$emit('setcompnamefocus', 'blur')
             this.scrollIntoView(newData[i].children[0].id)
             return
           }
-          this.openBucketIndex = null
-          this.children = null
-          this.index = null
-          this.setFocus('regular')
         }
+        this.openBucketIndex = null
+        this.children = null
+        this.index = null
+        this.setFocus('regular')
       },
-      setExactMatchesOnLoad() {
-        let selectedConflictsCopy = [...this.selectedConflicts]
-        for (let title of this.conflictTitles) {
-          if (title.nrNumber) {
-            if (!this.selectedConflicts.find(conflict => conflict.nrNumber === title.nrNumber)) {
-              if (selectedConflictsCopy.length >= 3) break
-              selectedConflictsCopy.push(title)
-            }
+      setExactMatchesOnLoad(newData) {
+        if (!newData) newData = this.conflictTitles
+        let options = []
+        for (let title of newData) {
+          if (title.nrNumber && options.length < 3) {
+            options.push(title)
           }
         }
-        this.$store.commit('setSelectedConflicts', selectedConflictsCopy)
+        this.setCheckbox(options)
       },
     }
   }
@@ -483,6 +534,8 @@
   .conflict-no-match {
     color: var(--l-grey);
     height: 32px !important;
+    padding: 3px 0 0 8px;
+
   }
 
   .conflict-phonetic-title {
@@ -521,6 +574,6 @@
 
   .shift-up {
     position: relative;
-    top: -4px !important;
+    top: 4px !important;
   }
 </style>

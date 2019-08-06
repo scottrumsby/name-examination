@@ -1,6 +1,6 @@
 <!--eslint-disable-->
 <template>
-  <v-container decision-container fluid py-0 px-5 :opacity-30="!is_making_decision">
+  <v-container decision-container fluid py-0 px-3 :opacity-30="!is_making_decision">
     <v-layout wrap>
       <v-flex lg6
               fs-24
@@ -38,8 +38,8 @@
         <v-layout wrap add-stock-text-col>
 
           <!--CONDITIONS-->
-          <v-flex lg12 id="conditions-select-area">
-            <p class="fs-15 fw-600">Conditions</p>
+          <v-flex lg12 mt-2 id="conditions-select-area">
+            <div class="fs-15 my-2 fw-600">Conditions</div>
             <div id="conditions-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
                         :height="selected_conditions.length <= 1 ? 30 : null"
@@ -69,8 +69,8 @@
 
           <!--CONFLICTS-->
           <v-flex lg12 id="conflicts-select-area">
-            <p class="fs-15 fw-600">Conflicts</p>
-            <div id="conflicts-decision-select-field">
+            <div class="fs-15 mb-2 mt-4 fw-600">Conflicts</div>
+            <div id="conflicts-decision-select-field" >
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
                         :height="selected_conflicts.length <= 1 ? 30 : null"
                         :items="conflictList"
@@ -98,12 +98,11 @@
 
           <!--MARCROS-->
           <v-flex lg12 data-app id="macros-v-flex" ref="macrosField">
-            <p class="fs-15 fw-600">Macros</p>
+            <div class="fs-15 mb-2 mt-4 fw-600">Macros</div>
             <div id="macros-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
                         :height="selectedReasons.length <= 1 ? 30 : null"
                         :items="listDecisionReasons"
-                        @click="focusInput('macros-select-text')"
                         :menu-props="menuProps"
                         browser-autocomplete="off"
                         chips
@@ -129,12 +128,11 @@
 
           <!--TRADEMARKS-->
           <v-flex data-app id="trademarks-v-flex" ref="trademarksSelectField">
-            <p class="fs-15 fw-600">Trademarks</p>
+            <div class="fs-15 mb-2 mt-4 fw-600">Trademarks</div>
             <div id="trademarks-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
                         :height="selected_trademarks.length <= 1 ? 30 : null"
                         :items="trademarks"
-                        @click="focusInput('trademarks-select-text')"
                         :menu-props="menuProps"
                         browser-autocomplete="off"
                         chips
@@ -174,7 +172,7 @@
                   <img src="/static/images/buttons/edit-button-icon.png">
                 </v-btn>
             </div></v-flex>
-          <v-flex textarea-outer-v-flex pa-2 pt-3 mt-2>
+          <v-flex textarea-outer-v-flex mt-2>
             <v-textarea class="fs-14 pa-0 ma-0 decision-msg-textarea"
                         readonly
                         full-width
@@ -271,9 +269,8 @@
       return {
         consent_required_by_user: false,
         customer_message_override: null,
-        fieldSearch: null,
-        editMessageModalVisible: false,
         editTextarea: null,
+        editMessageModalVisible: false,
         menuProps: {
           auto: false,
           closeOnContentClick: true,
@@ -544,7 +541,7 @@
       },
       hideModal() {
         this.editMessageModalVisible = false
-        this.$root.$emit('addconflictlistener')
+        this.$store.commit('setConflictsListenerState', 'listenAll')
       },
       nameAccept() {
         this.$store.commit('decision_made', 'APPROVED')
@@ -575,6 +572,7 @@
             currentNameObj[`conflict${ n + 1 }_num`] = selected_conflicts[n].nrNumber
           }
         }
+        console.log(currentNameObj.name)
         currentNameObj.name = currentNameObj.name.trimEnd()
         currentNameObj.decision_text = this.customer_message_display.substr(0, 955)
         // send decision to API and reset flags
@@ -603,13 +601,13 @@
       showModal() {
         Vue.set(this, 'editTextarea', this.customer_message_display)
         this.editMessageModalVisible = true
-        this.$root.$emit('removeconflictlistener')
+        this.$store.commit('setConflictsListenerState', 'disabled')
       },
       trademarksLabel(obj) {
         return obj.name + ' - ' + obj.application_number
       },
       truncateChipText(text) {
-        return text.length > 32 ? text.substr(0, 32) + '...' : text
+        return text.length > 37 ? `${text.slice(0,37)}...` : text
       },
     },
   }
@@ -661,14 +659,9 @@
     padding: 5px 5px 0 5px !important;
     border: 1px solid var(--l-grey);
     background-color: white;
-    margin: 12px 15px 0 0;
-
-  }
-
-  .decision-select-seach-input {
-    padding: 5px 5px 0 5px !important;
-    background-color: white;
-    height: 38px;
+    margin-right: 10px;
+    position: relative;
+    top: 10px;
   }
 
   .notification-banner {

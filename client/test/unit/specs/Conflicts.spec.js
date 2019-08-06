@@ -96,7 +96,7 @@ describe('Conflicts', () => {
     })
 
     it('does NOT general conflicts (garbage bucket)', () => {
-      expect(data.vm.$el.querySelector('#conflict-list').textContent.search('Incredible World LTD')).toBe(-1);
+      expect(data.vm.$el.querySelector('#conflicts-container').textContent.search('Incredible World LTD')).toBe(-1);
     })
 
     it('does NOT change conflicts tab to red', () => {

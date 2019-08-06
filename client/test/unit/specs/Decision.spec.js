@@ -31,15 +31,10 @@ describe('Decision.vue', () => {
     instance = new Constructor({store: store});
 
     instance.decision_made = null;
-
-    // stub $refs for function call that is not part of these tests
-    instance.$refs = {
-      decisioncomments: {
-        addNewComment() {
-          return null;
-        }
-      }
-    };
+    instance.$store.state.currentNameObj = {
+      name: 'blah',
+      choice: null,
+    }
   });
 
   describe('When conditions have been selected with consent required', () => {
@@ -197,7 +192,7 @@ describe('Decision.vue', () => {
 
       instance.decision_made = null;
 
-      instance.selectedConflicts = [
+      instance.$store.state.selectedConflicts = [
         {
           "nrNumber": "0299669",
           "text": "DR. EARL J. MCDONALD INC.",

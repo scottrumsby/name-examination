@@ -1,8 +1,8 @@
 /* eslint-disable */
 <template>
-  <v-container ma-0 pa-0 fluid bg-color>
-    <v-layout>
-      <spinner className="conflict-detail-spinner hidden pb-5"/>
+  <v-container ma-0 pa-0 fluid bg-color id="conflict-info-container">
+    <v-layout id="conflict-info-layout">
+      <spinner className="conflict-detail-spinner pb-5"/>
       <CorpMatch id="corpmatch" class="conflict-info-view" v-if="is_corp"/>
       <NamesMatch id="namematch" class="conflict-info-view" v-else-if="is_names"/>
       <NullMatch class="conflict-info-view" v-else/>
@@ -21,11 +21,7 @@
     name: 'ConflictInfo',
     components: { CorpMatch, NamesMatch, NullMatch, spinner, },
     mounted() {
-      let el = document.getElementById('corpmatch') ?
-        document.getElementById('corpmatch') : document.getElementById('namematch')
-      if (el) {
-        el.scrollIntoViewIfNeeded()
-      }
+      this.scrollIntoView()
     },
     computed: {
       currentConflict() {
@@ -44,6 +40,23 @@
         return false
       },
     },
+    watch: {
+      currentConflict(newData, oldData) {
+        if (newData) {
+          this.scrollIntoView()
+        }
+      }
+    },
+    methods: {
+      scrollIntoView() {
+        this.$nextTick(function () {
+          let el = document.getElementById('conflict-info-container')
+          if (el) {
+            el.scrollIntoViewIfNeeded(false)
+          }
+        })
+      }
+    }
   }
 </script>
 
@@ -52,7 +65,7 @@
     display: none !important;
   }
   .bg-color {
-    background-color: var(--xl-cyan);
+    background-color: var(--l-blue);
   }
 
 </style>
