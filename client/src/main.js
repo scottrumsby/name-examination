@@ -5,6 +5,7 @@ import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import Vuelidate from 'vuelidate'
 import Vuetify from 'vuetify'
+import VDragged from 'v-dragged'
 import { Plugin } from 'vue-fragment'
 
 import App from './App'
@@ -19,6 +20,7 @@ Vue.use(Plugin)
 Vue.use(require('vue-shortkey'))
 Vue.use(Vuelidate)
 Vue.use(Vuetify)
+Vue.use(VDragged)
 
 Vue.config.productionTip = false
 

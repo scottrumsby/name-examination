@@ -787,6 +787,52 @@ export const actions = {
     commit('setSelectedReasons', [])
     commit('setSelectedTrademarks', [])
   },
+  getTransactionsHistory({ commit, dispatch }, nrNumber) {
+    const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
+    const url = '/api/v1/events/' + nrNumber
+    commit('toggleTransactionsSpinner', true)
+    commit('toggleTransactionsModal', true)
+    return new Promise((resolve, reject) => {
+      axios.get(url, { headers: { Authorization: `Bearer ${ myToken }` }})
+        .then(response => {
+          let { transactions } = response.data
+          let jsonDataFalse = [
+            'Get NR Details from NRO',
+            'Decision',
+            'Updated NRO',
+            'Hold Request',
+            'Get Next NR',
+            'Marked on Hold',
+            'Migrated by NRO',
+            'Set to Historical by NRO(Migration)',
+            'Expired by NRO',
+            'Cancelled in NRO',
+          ]
+
+          for (let entry in transactions) {
+            let item = transactions[entry]
+            if (typeof item.jsonData === 'string') {
+              item.jsonData = JSON.parse(item.jsonData)
+            }
+            if (item.jsonData && Object.keys(item.jsonData).length > 0) {
+              item.showJSONData = true
+              if ( jsonDataFalse.includes(item.user_action) ) {
+                item.showJSONData = false
+              }
+            } else {
+              item.showJSONData = false
+            }
+            data.push(item)
+          }
+          commit('setTransactionsData', data)
+          commit('toggleTransactionsSpinner', false)
+          resolve()
+        })
+        .catch( () => {
+          reject()
+        })
+    })
+  }
 }
 
 export const getters = {
@@ -1244,6 +1290,22 @@ export const getters = {
     }
     return state.consentRequiredByUser || checkConditions() || false
   },
+  getShortJurisdiction: state => jurisdiction => {
+    jurisdiction = jurisdiction.toUpperCase()
+    if ( jurisdiction.length === 2 ) return jurisdiction
+
+    let index
+    let textIndex = state.listJurisdictions.findIndex(opt => opt.text === jurisdiction)
+    if ( textIndex >= 0 ) index = textIndex
+    let shortIndex = state.listJurisdictions.findIndex(opt => opt.SHORT_DESC === jurisdiction)
+    if ( shortIndex >= 0 ) index = shortIndex
+
+    if ( typeof index === 'number' ) {
+      return state.listJurisdictions[index].value
+    }
+
+    return '?'
+  }
 }
 
 export const mutations = {
@@ -2216,6 +2278,9 @@ export const mutations = {
     Vue.set( state, 'selectedReasons', payload )
   },
   setConsentRequiredByUser: (state, payload) => state.consentRequiredByUser = payload,
+  toggleTransactionsModal: (state, payload) => state.transactionsModalVisible = payload,
+  setTransactionsData: (state, payload) => state.transactionsData = payload,
+  toggleTransactionsSpinner: (state, payload) => state.showTransactionsModalSpinner = payload,
 }
 
 export const state = {
@@ -2433,6 +2498,9 @@ export const state = {
   selectedReasons: [],
   selectedTrademarks: [],
   showCommentsPopUp: false,
+  transactionsModalVisible: false,
+  transactionsData: null,
+  showTransactionsModalSpinner: true,
 }
 
 export default new Vuex.Store({ actions, getters, mutations, state, })
