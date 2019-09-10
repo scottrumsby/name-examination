@@ -8,6 +8,10 @@ exports[`NameExamination.vue renders a NameExamination view 1`] = `
    
   <!---->
    
+  <keep-alive-stub>
+    <!---->
+  </keep-alive-stub>
+   
   <!---->
    
   <v-container-stub

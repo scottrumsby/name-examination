@@ -9,11 +9,14 @@
          v-if="this.exactHistoryMatches">
       <v-icon class="notice-icon">warning</v-icon>Similar name previously <b>{{ exactMatch }}</b>
     </div>
+    <keep-alive>
+      <Transactions v-if="$store.state.transactionsModalVisible" />
+    </keep-alive>
 
     <CommentsPopUp v-if="showCommentsPopUp" />
     <v-container fluid name-exam-container >
       <v-layout>
-        <RequestInfoHeader />
+          <RequestInfoHeader />
       </v-layout>
       <v-layout v-if="!is_editing" wrap>
         <v-flex lg12><CompName /></v-flex>
@@ -27,6 +30,7 @@
   import CommentsPopUp from '@/components/application/Examine/CommentsPopUp'
   import CompName from '@/components/application/Examine/CompName.vue';
   import RequestInfoHeader from '@/components/application/Examine/RequestInfoHeader.vue';
+  import Transactions from './Transactions'
 
   export default {
     name: "NameExanination",
@@ -37,7 +41,7 @@
         visible: true,
       }
     },
-    components: { CommentsPopUp, CompName, RequestInfoHeader, },
+    components: { Transactions, CommentsPopUp, CompName, RequestInfoHeader, },
     computed: {
       stated() {
         return this.$store
