@@ -2297,6 +2297,7 @@ export const mutations = {
       page: 1,
       expand: null,
       scrollOffset: 0,
+      sortDescending: true,
     }
   }
 }
@@ -2524,6 +2525,7 @@ export const state = {
     page: 1,
     expand: null,
     scrollOffset: 0,
+    sortDescending: true,
   }
 }
 

@@ -4,7 +4,8 @@
                class="transactions-modal"
                :class="maximized ? 'transactions-modal-lg' : 'transactions-modal-sm'"
                pa-0>
-      <v-layout v-dragged="onDrag">
+    <!--Top/Header Portion-->
+    <v-layout v-dragged="onDrag">
         <v-flex title-font grow>Transaction History</v-flex>
         <v-flex title-font shrink>
           <v-icon class="min-max-icon" @click="clickResize">
@@ -15,14 +16,14 @@
           </v-icon>
         </v-flex>
       </v-layout>
-      <v-layout grey-bar>
-        <v-flex fs-16-fw-700 grow>History for {{ nrNumber }}</v-flex>
-        <v-flex shrink>as at {{ timeStamp }}</v-flex>
-      </v-layout>
-    <div v-show="transactionsRequestStatus === 'success'"
-         :class="maximized ? 'main-panel-lg' : 'main-panel-sm'"
-         id="trans-main-panel">
-      <v-layout>
+    <v-layout grey-bar>
+      <v-flex fs-16-fw-700 grow>History for {{ nrNumber }}</v-flex>
+      <v-flex shrink>as at {{ timeStamp }}</v-flex>
+    </v-layout>
+
+    <!--Body/Table/Spinner portion-->
+    <v-layout :class="maximized ? 'main-panel-lg' : 'main-panel-sm'" id="trans-main-panel">
+      <v-layout v-if="transactionsRequestStatus === 'success'">
         <v-flex>
           <v-data-table :headers="headers"
                         :pagination.sync="pagination"
@@ -34,7 +35,19 @@
                 <th v-for="(header, i) in headers"
                     class="text-left"
                     :style="header.style">
-                  {{ header.text }}
+                  <template v-if="header.text === 'Date & Time'">
+                    <div class="date-sort" @click="sortDescending = !sortDescending">
+                      <div>{{ header.text }}</div>
+                      <div>
+                        <v-icon style="color: var(--link); position: relative; top: -3px;">
+                          {{ sortDescending ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}
+                        </v-icon>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    {{ header.text }}
+                  </template>
                 </th>
               </tr>
             </template>
@@ -64,18 +77,13 @@
           </v-data-table>
         </v-flex>
       </v-layout>
-    </div>
-    <div v-show="transactionsRequestStatus === 'failed'">
-      <v-layout pa-5>
+      <v-layout pa-5 v-if="transactionsRequestStatus === 'failed'">
         <v-flex pa-5>Network Error. Something went wrong.</v-flex>
       </v-layout>
-
-    </div>
-    <div v-show="transactionsRequestStatus === 'pending'">
-      <v-layout mb-5 pb-3>
+      <v-layout mb-5 pb-3 v-if="transactionsRequestStatus === 'pending'">
         <spinner />
       </v-layout>
-    </div>
+    </v-layout>
   </v-container>
 </template>
 
@@ -121,6 +129,16 @@
         'transactionsRequestStatus',
         'transactionsModalState'
       ]),
+      sortDescending: {
+        get() {
+          if ( this.transactionsModalState ) {
+            return this.transactionsModalState.sortDescending
+          }
+        },
+        set(value) {
+          this.$store.commit('setTransactionsModalState', { key: 'sortDescending', value })
+        }
+      },
       expand: {
         get() {
           if ( this.transactionsModalState ) {
@@ -167,9 +185,16 @@
           let output = this.transactionsData.sort((a,b) => {
             let A = moment(a.eventDate).format('x')
             let B = moment(b.eventDate).format('x')
-            if (A > B) return -1
-            if (A < B) return 1
-            return 0
+            if (this.sortDescending) {
+              if ( A > B ) return -1
+              if ( A < B ) return 1
+              return 0
+            }
+            if ( !this.sortDescending ) {
+              if ( A > B ) return 1
+              if ( A < B ) return -1
+              return 0
+            }
           })
           return output.filter(item => item.user_action || item.action)
         }
@@ -310,6 +335,12 @@
 
   .main-panel-sm {
     max-height: 450px;
+  }
+
+  .date-sort {
+    color: var(--link);
+    display: flex;
+    cursor: pointer;
   }
 
   .transactions-modal-sm {
