@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid pl-5>
+  <v-container fluid pa-1 pl-5>
     <v-layout :class="addBottomBorder(index) ? 'border-bottom' : ''"
               :key="index+'json-data'"
               v-for="(item, index) of data"
@@ -147,7 +147,7 @@
     },
     computed: {
       ...mapGetters(['nrNumber']),
-      ...mapState(['transactionsData', 'transactionsNR', 'showTransactionsModalSpinner']),
+      ...mapState(['transactionsData', 'transactionsNR', 'transactionsRequestStatus']),
       data() {
         if (typeof this.jsonData === 'object' && Object.keys(this.jsonData).length > 0) {
           let output = []

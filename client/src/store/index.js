@@ -454,7 +454,6 @@ export const actions = {
     var newQuery = '?order=priorityCd:desc,submittedDate:asc&queue=' + stateCd +
       '&furnished=true&unfurnished=true&rows=1&start=0'
     const url = '/api/v1/requests' + newQuery
-    const vm = this
     return axios.get( url, { headers: { Authorization: `Bearer ${ myToken }` } } )
                 .then( response => {
                   var params = {
@@ -780,6 +779,7 @@ export const actions = {
     commit('setConflictsAutoAdd', true)
     commit('setConsentRequiredByUser', false)
     commit('setCustomerMessageOverride', null)
+    commit('resetTransactionModalState')
   },
   resetDecision({ commit }) {
     commit('setSelectedConditions', [])
@@ -790,7 +790,7 @@ export const actions = {
   getTransactionsHistory({ commit, dispatch }, nrNumber) {
     const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
     const url = '/api/v1/events/' + nrNumber
-    commit('toggleTransactionsSpinner', true)
+    commit('setTransactionsRequestStatus', 'pending')
     commit('toggleTransactionsModal', true)
     return new Promise((resolve, reject) => {
       axios.get(url, { headers: { Authorization: `Bearer ${ myToken }` }})
@@ -808,6 +808,7 @@ export const actions = {
             'Expired by NRO',
             'Cancelled in NRO',
           ]
+          let data = []
 
           for (let entry in transactions) {
             let item = transactions[entry]
@@ -825,10 +826,12 @@ export const actions = {
             data.push(item)
           }
           commit('setTransactionsData', data)
-          commit('toggleTransactionsSpinner', false)
+          commit('setTransactionsRequestStatus', 'success')
           resolve()
         })
-        .catch( () => {
+        .catch( error => {
+          console.log(error)
+          commit('setTransactionsRequestStatus', 'failed')
           reject()
         })
     })
@@ -2280,7 +2283,22 @@ export const mutations = {
   setConsentRequiredByUser: (state, payload) => state.consentRequiredByUser = payload,
   toggleTransactionsModal: (state, payload) => state.transactionsModalVisible = payload,
   setTransactionsData: (state, payload) => state.transactionsData = payload,
-  toggleTransactionsSpinner: (state, payload) => state.showTransactionsModalSpinner = payload,
+  setTransactionsRequestStatus: (state, payload) => state.transactionsRequestStatus = payload,
+  setTransactionsModalState(state, {key, value}) {
+    Vue.set(
+      state.transactionsModalState,
+      key,
+      value
+    )
+  },
+  resetTransactionModalState(state) {
+    state.transactionsModalState = {
+      maximized: true,
+      page: 1,
+      expand: null,
+      scrollOffset: 0,
+    }
+  }
 }
 
 export const state = {
@@ -2500,7 +2518,13 @@ export const state = {
   showCommentsPopUp: false,
   transactionsModalVisible: false,
   transactionsData: null,
-  showTransactionsModalSpinner: true,
+  transactionsRequestStatus: 'pending',
+  transactionsModalState: {
+    maximized: true,
+    page: 1,
+    expand: null,
+    scrollOffset: 0,
+  }
 }
 
 export default new Vuex.Store({ actions, getters, mutations, state, })

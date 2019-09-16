@@ -9,11 +9,14 @@
          v-if="this.exactHistoryMatches">
       <v-icon class="notice-icon">warning</v-icon>Similar name previously <b>{{ exactMatch }}</b>
     </div>
-    <Transactions v-if="$store.state.transactionsModalVisible" />
+    <keep-alive>
+      <Transactions v-if="$store.state.transactionsModalVisible" />
+    </keep-alive>
+
     <CommentsPopUp v-if="showCommentsPopUp" />
     <v-container fluid name-exam-container >
       <v-layout>
-        <RequestInfoHeader />
+          <RequestInfoHeader />
       </v-layout>
       <v-layout v-if="!is_editing" wrap>
         <v-flex lg12><CompName /></v-flex>
