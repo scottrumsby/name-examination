@@ -27,6 +27,7 @@
           <v-flex>
             <v-textarea class="comments-text-area"
                         ref="commentstextarea"
+                        :rows="8"
                         no-resize
                         v-model="newComment" />
           </v-flex>
@@ -37,7 +38,7 @@
             <b style="font-weight: 600">Sa<span class="shortkey">v</span>e</b>
           </v-btn>
         </v-flex>
-        <v-layout px-3 pb-2 mt-2 column style="overflow-y: scroll; max-height: 475px;">
+        <v-layout px-3 pb-2 mt-2 column style="overflow-y: scroll; max-height: 425px;">
           <template v-for="(comment, i) in comments">
             <v-flex fs-15 ws-pre>
               <span style="white-space: pre-line" >{{ comment.comment }}</span>
@@ -180,7 +181,6 @@
     background-color: white;
     border: 1px solid var(--l-grey);
     width: 320px;
-    height: 80px;
   }
 
   .shortkey {
