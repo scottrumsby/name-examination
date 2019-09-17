@@ -4,8 +4,8 @@
             style="z-index: 11111; position: absolute; top: 165px; left: 25px;"
             class="expanded-info"
             width="350px">
-      <v-container fluid p-1 ma-0>
-        <v-layout mt-4>
+      <v-container fluid pa-0 ma-0>
+        <v-layout my-2>
           <v-flex lg8="!is_editing">
             <v-icon color="grey" class="mirrored fs-18 ml-3 mr-1">
               chat_bubble_outline
@@ -38,15 +38,17 @@
             <b style="font-weight: 600">Sa<span class="shortkey">v</span>e</b>
           </v-btn>
         </v-flex>
-        <v-layout px-3 pb-2 mt-2 column style="overflow-y: scroll; max-height: 425px;">
+        <v-layout px-3 pb-2 mt-2 column style="overflow-y: auto; max-height: 425px;">
           <template v-for="(comment, i) in comments">
             <v-flex fs-15 ws-pre>
               <span style="white-space: pre-line" >{{ comment.comment }}</span>
             </v-flex>
-            <v-flex fs-14 mt-2 ft-ital>
+            <v-flex fs-14 mt-1 ft-ital>
               {{ comment.examiner }} - {{ formatTime(comment.timestamp) }}
             </v-flex>
-            <v-divider v-if="i < commentsCount - 1 " />
+            <v-flex my-2>
+              <v-divider v-if="i < commentsCount - 1 " />
+            </v-flex>
           </template>
         </v-layout>
       </v-container>
