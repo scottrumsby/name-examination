@@ -52,7 +52,6 @@
             <div class="fs-15 my-2 fw-600">Conditions</div>
             <div id="conditions-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
-                        height="30px"
                         :items="conditionsInstructions"
                         :menu-props="menuProps"
                         browser-autocomplete="off"
@@ -83,7 +82,6 @@
             <div class="fs-15 mb-2 mt-4 fw-600">Conflicts</div>
             <div id="conflicts-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
-                        height="30px"
                         :items="conflictList"
                         :menu-props="menuProps"
                         browser-autocomplete="off"
@@ -122,7 +120,6 @@
             <div class="fs-15 mb-2 mt-4 fw-600">Macros</div>
             <div id="macros-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
-                        height="30px"
                         :items="listDecisionReasons"
                         :menu-props="menuProps"
                         browser-autocomplete="off"
@@ -152,7 +149,6 @@
             <div class="fs-15 mt-4 fw-600">Trademarks</div>
             <div id="trademarks-decision-select-field">
               <v-select :disabled="customer_message_override !== null || !is_making_decision"
-                        height="30px"
                         :items="trademarks"
                         :menu-props="menuProps"
                         browser-autocomplete="off"
