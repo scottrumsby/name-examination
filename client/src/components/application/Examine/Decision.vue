@@ -267,12 +267,14 @@
               <div :class="editTextareaProps.class">{{ editTextareaProps.count }}</div>
             </v-flex>
           </v-layout>
-          <v-layout justify-start row mt-4 pl-3>
-            <v-flex text-right c-link>
+          <v-layout justify-end row mt-4 pl-3>
+            <v-flex shrink c-link>
               <v-btn id="message-cancel-button"
                      flat
                      @click="hideModal">Cancel
               </v-btn>
+            </v-flex>
+            <v-flex shrink c-link>
               <v-btn id="message-save-button"
                      flat
                      :disabled="!messageEdited"
