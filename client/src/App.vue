@@ -7,7 +7,10 @@
         <std-header style="z-index: 2"> </std-header>
         <router-view style="z-index: 1"></router-view>
       </div>
-      <v-dialog v-model="showErrorModal" persistent width="50%" class="pa-0">
+      <v-dialog v-model="showErrorModal"
+                width="50%"
+                content-class="shift-dialog-up"
+                class="pa-0">
         <v-container fluid ma-0 pa-0 bg-white>
           <v-layout column>
             <v-flex class="fw-700 fs-18 mb-0 pa-2" :class="modalType === 'error' ? 'error-modal' : 'warning-modal'">
@@ -126,6 +129,11 @@ export default {
 
   .bg-white {
     background-color: white;
+  }
+
+  .shift-dialog-up {
+    position: relative;
+    top: -200px;
   }
 
   .pre-line {

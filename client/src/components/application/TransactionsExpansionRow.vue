@@ -8,9 +8,10 @@
       <!--NAME CHOICES + NAME DECISION TEXT -->
       <v-layout column v-if="item.key === 'names'" pb-2>
         <v-flex json-data-header>Names</v-flex>
-        <v-layout v-for="(name, i) of getOrderedNames(item.value)" column>
-          <v-layout :key="'tr-names'+i"
-                    v-if="name"
+        <v-layout v-for="(name, i) of getOrderedNames(item.value)"
+                  :key="'tr-names'+i"
+                  column>
+          <v-layout v-if="name"
                     ml-5>
             <v-flex shrink>{{ name.choice }}.</v-flex>
             <v-flex grow pl-2>
