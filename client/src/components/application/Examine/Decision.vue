@@ -2,7 +2,9 @@
 <template>
   <v-container v-if="$store.getters.decisionPanel.show"
                decision-container
-               fluid py-0 px-3
+               fluid
+               py-0
+               px-3
                :opacity-30="!is_making_decision">
     <v-layout wrap>
       <v-flex lg6
@@ -20,7 +22,7 @@
         <div class="fs-15" style="position: relative; top: 4px">Consent</div>
       </v-layout>
 
-      <v-flex lg12 style="position: relative; top: -11px">
+      <v-flex lg12>
         <v-divider />
       </v-flex>
 
