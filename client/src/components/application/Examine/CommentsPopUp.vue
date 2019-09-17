@@ -24,7 +24,7 @@
           </v-flex>
         </v-layout>
         <v-layout column>
-          <v-flex>
+          <v-flex shrink>
             <v-textarea class="comments-text-area"
                         ref="commentstextarea"
                         :rows="8"
@@ -32,12 +32,18 @@
                         v-model="newComment" />
           </v-flex>
         </v-layout>
-        <v-flex text-right c-link>
-          <v-btn id="comments-cancel-button" flat :ripple="false" @click="clickCancel()">Cancel</v-btn>
-          <v-btn id="comments-save-button" flat :ripple="false" :disabled="saveButtonDisabled" @click="saveInfo">
-            <b style="font-weight: 600">Sa<span class="shortkey">v</span>e</b>
-          </v-btn>
-        </v-flex>
+
+        <v-layout justify-end>
+          <v-flex shrink c-link>
+            <v-btn id="comments-cancel-button" flat :ripple="false" @click="clickCancel()">Cancel</v-btn>
+          </v-flex>
+          <v-flex shrink c-link>
+            <v-btn id="comments-save-button" flat :ripple="false" :disabled="saveButtonDisabled" @click="saveInfo">
+              <b style="font-weight: 600">Sa<span class="shortkey">v</span>e</b>
+            </v-btn>
+          </v-flex>
+        </v-layout>
+
         <v-layout px-3 pb-2 mt-2 column style="overflow-y: auto; max-height: 425px;">
           <template v-for="(comment, i) in comments">
             <v-flex fs-15 ws-pre>
