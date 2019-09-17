@@ -47,14 +47,14 @@
 <script>
 /* eslint-disable */
 
-import StdHeader from "./application/sections/StdHeader";
+import StdHeader from "./application/sections/StdHeader"
+import moment from 'moment'
 
 export default {
   components: {StdHeader},
   name: 'LandingPage',
     watch: {
       auth: function (val) {
-
           if(val){ this.getCurrentStats() }
       }
     },
@@ -63,10 +63,7 @@ export default {
         return this.$store.getters.isAuthenticated
       },
       todayStr() {
-        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        var d = new Date();
-        return days[d.getDay()] + ", " + months[d.getMonth()] + " " + d.getDate() + " " + d.getFullYear()
+        return moment().format('YYYY-MM-DD, h:mm a')
       },
       statsData() {
         return this.$store.getters.statsDataJSON;
@@ -76,7 +73,6 @@ export default {
       //states: ['ALL', 'HOLD', 'INPROGRESS', 'DRAFT', 'EXPIRED', 'CANCELLED', 'APPROVED', 'CONDITIONAL', 'REJECTED'],
       getCurrentStats() {
         this.$store.statsDataJSON=null
-
         //var nStates = ['hold', 'draft', 'expired', 'cancelled', 'approved', 'conditional', 'rejected']
         var nStates = ['hold', 'draft']
         var vm = this

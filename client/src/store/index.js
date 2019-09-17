@@ -1212,7 +1212,7 @@ export const getters = {
   selectedConflictID: state => state.selectedConflictID,
   expandedConflictID: state => state.expandedConflictID,
   openBucket: state => state.openBucket,
-  conflictTitles(state) {
+  conflictTitles(state, getters) {
     let output = []
     if ( state.conflictsReturnedStatus ) {
 
@@ -1253,7 +1253,7 @@ export const getters = {
 
       }
     }
-    return output
+    return output.filter(match => match.nrNumber !== getters.nrNumber)
   },
   selectedNRs(state) {
     if ( state.selectedConflicts && state.selectedConflicts.length > 0 ) {
@@ -1308,7 +1308,7 @@ export const getters = {
     }
 
     return '?'
-  }
+  },
 }
 
 export const mutations = {
@@ -2299,7 +2299,8 @@ export const mutations = {
       scrollOffset: 0,
       sortDescending: true,
     }
-  }
+  },
+  setConflictsPreserveMessage: (state, payload) => state.conflictsPreserveMessage = payload,
 }
 
 export const state = {
@@ -2526,7 +2527,8 @@ export const state = {
     expand: null,
     scrollOffset: 0,
     sortDescending: true,
-  }
+  },
+  conflictsPreserveMessage: false,
 }
 
 export default new Vuex.Store({ actions, getters, mutations, state, })
