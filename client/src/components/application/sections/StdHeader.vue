@@ -15,7 +15,6 @@
         <v-toolbar flat color="white" height="70px">
           <v-toolbar-items>
             <v-btn flat
-                   :ripple="true"
                    :href="adminURL"
                    id="admin"
                    target="_blank">

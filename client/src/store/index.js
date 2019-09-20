@@ -791,6 +791,8 @@ export const actions = {
     const myToken = sessionStorage.getItem('KEYCLOAK_TOKEN')
     const url = '/api/v1/events/' + nrNumber
     commit('setTransactionsRequestStatus', 'pending')
+    commit('toggleCommentsPopUp', false)
+    commit('toggleRequestBannerPopUp', null)
     commit('toggleTransactionsModal', true)
     return new Promise((resolve, reject) => {
       axios.get(url, { headers: { Authorization: `Bearer ${ myToken }` }})
@@ -2300,7 +2302,6 @@ export const mutations = {
       sortDescending: true,
     }
   },
-  setConflictsPreserveMessage: (state, payload) => state.conflictsPreserveMessage = payload,
 }
 
 export const state = {

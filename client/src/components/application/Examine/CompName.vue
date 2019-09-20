@@ -552,7 +552,7 @@
 
   .examine-search {
     background-color: white;
-    border: none !important;
+    border: 1px solid lightgrey !important;
     font-size: 15px;
     height: 40px;
     margin-bottom: auto;
