@@ -31,9 +31,9 @@
                         rows-per-page-text=""
                         class="ma-2">
             <template v-slot:headers="{ headers }">
-              <tr class="text-left">
+              <tr style="text-align: left" id="header-cells">
                 <th v-for="(header, i) in headers"
-                    class="text-left"
+                    style="text-align: left"
                     :style="header.style">
                   <template v-if="header.text === 'Date & Time'">
                     <div class="date-sort" @click="sortDescending = !sortDescending">
@@ -69,7 +69,7 @@
               </tr>
               <tr v-if="expand === index"
                   class="bg-xl-blue ma-0 pa-0">
-                <td colspan="5" class="ma-0 pa-0">
+                <td colspan="5" class="pr-5 mr-5">
                   <TransactionsExpansionRow :jsonData="item.jsonData" />
                 </td>
               </tr>
@@ -308,6 +308,7 @@
     background-color: white;
     box-shadow: 0px 0px 20px 4px grey;
     z-index: 9999;
+    overflow: hidden;
   }
 
 
@@ -318,7 +319,11 @@
   }
 
   tr:hover:not(.bg-xl-blue) {
-    background-color: unset !important;
+    background-color: whitesmoke !important;
+  }
+
+  #header-cells:hover {
+    background-color: white !important;
   }
 
   .bg-xl-blue {
@@ -327,6 +332,7 @@
 
   #trans-main-panel {
     overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   .main-panel-lg {

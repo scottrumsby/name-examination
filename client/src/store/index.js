@@ -801,6 +801,7 @@ export const actions = {
           let jsonDataFalse = [
             'Get NR Details from NRO',
             'Decision',
+            'Load NR',
             'Updated NRO',
             'Hold Request',
             'Get Next NR',

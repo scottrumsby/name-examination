@@ -2,16 +2,18 @@
   <v-container fluid pa-1 pl-5>
     <v-layout :class="addBottomBorder(index) ? 'border-bottom' : ''"
               :key="index+'json-data'"
+              text-overflow
               v-for="(item, index) of data"
               v-if="checkConditions(item)">
 
       <!--NAME CHOICES + NAME DECISION TEXT -->
-      <v-layout column v-if="item.key === 'names'" pb-2>
+      <v-layout column v-if="item.key === 'names'" pb-2 style="white-space: normal">
         <v-flex json-data-header>Names</v-flex>
         <v-layout v-for="(name, i) of getOrderedNames(item.value)"
                   :key="'tr-names'+i"
                   column>
           <v-layout v-if="name"
+                    :mt-2="i !== 0"
                     ml-5>
             <v-flex shrink>{{ name.choice }}.</v-flex>
             <v-flex grow pl-2>
@@ -25,14 +27,14 @@
                 </span>
             </v-flex>
           </v-layout>
-          <v-layout ml-2 :key="'tr-names-2'+i">
+          <v-layout ml-5 pl-2 :key="'tr-names-2'+i">
             <v-flex>{{ name.decision_text }}</v-flex>
           </v-layout>
         </v-layout>
       </v-layout>
 
       <!--COMMENTS-->
-      <v-layout column v-else-if="item.key === 'comments'">
+      <v-layout column v-else-if="item.key === 'comments'" style="overflow: none; overflow-wrap: break-word">
         <v-flex json-data-header>Comments</v-flex>
         <div class="ml-5 mr-5 my-3">
           <v-layout :comment-style="i !== 0"
@@ -202,9 +204,16 @@
 </script>
 
 <style scoped>
+  .text-overflow {
+    white-space: pre-line;
+    overflow-wrap: break-word !important;
+    overflow: hidden;
+  }
+
   .fs-11 {
     font-size: 11px;
   }
+
   .json-data-header {
     font-size: 15px;
     font-weight: 600;
