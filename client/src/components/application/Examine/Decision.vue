@@ -28,8 +28,7 @@
 
       <v-flex d-flex
               style="position: relative; top: -8px;"
-              ma-0
-              mb-1
+              my-2
               notification-banner
               v-if="conditionsText && conditionsText.length > 0">
         <v-layout my-auto wrap>
