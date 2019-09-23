@@ -210,17 +210,6 @@ html {
   width: 40px;
 }
 
-.styled-input {
-  background-color: var(--xl-grey);
-  border: none !important;
-  font-size: 15px;
-  height: 40px;
-  margin-bottom: auto;
-  margin-top: auto;
-  padding: 5px 10px 5px 10px;
-  width: 225px;
-}
-
 .xl-grey-bg {
   background-color: var(--xl-grey) !important;
 }

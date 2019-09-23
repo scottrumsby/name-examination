@@ -68,7 +68,7 @@
       return {
         alignTop: {
           position: 'relative',
-          top: `${-8}px`
+          top: '-8px'
         },
       }
     },
