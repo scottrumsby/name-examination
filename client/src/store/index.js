@@ -815,6 +815,9 @@ export const actions = {
 
           for (let entry in transactions) {
             let item = transactions[entry]
+            if (!item.user_action) {
+              item.user_action = item.action
+            }
             if (typeof item.jsonData === 'string') {
               item.jsonData = JSON.parse(item.jsonData)
             }

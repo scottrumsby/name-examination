@@ -39,6 +39,7 @@
                     <div class="date-sort" @click="sortDescending = !sortDescending">
                       <div>{{ header.text }}</div>
                       <div>
+
                         <v-icon style="color: var(--link); position: relative; top: -3px;">
                           {{ sortDescending ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}
                         </v-icon>
@@ -70,7 +71,7 @@
               <tr v-if="expand === index"
                   class="bg-xl-blue ma-0 pa-0">
                 <td colspan="5" class="pr-5 mr-5">
-                  <TransactionsExpansionRow :jsonData="item.jsonData" />
+                  <TransactionsExpansionRow :jsonData="item.jsonData" id="trans-expansion-row" />
                 </td>
               </tr>
             </template>
@@ -112,13 +113,10 @@
     },
     mounted() {
       this.timeStamp = moment().format('YYYY-MM-DD, h:mm a')
-      document.getElementById('trans-main-panel').addEventListener(
-        'scroll', debounce(this.saveScrollPosition, 350)
-      )
-      /*this.$nextTick(function() {
-        document.removeEventListener('click', this.handleDismissClick)
-        document.addEventListener('click', this.handleDismissClick)
-      })*/
+      let el = document.getElementById('trans-main-panel')
+      if (el) {
+        el.addEventListener('scroll', debounce(this.saveScrollPosition, 350))
+      }
     },
     computed: {
       ...mapGetters(['nrNumber']),
